@@ -7,6 +7,7 @@ import Api from "../services/api";
 export const signup = async (user: Object) => {
   try {
     const response = await Api.post(userEndpoints.signup, user);
+    console.log(response)
     return response;
   } catch (error) {
     if (error && (error as AxiosError).isAxiosError) {
@@ -17,23 +18,23 @@ export const signup = async (user: Object) => {
   }
 };
 
-// export const signUpLast = async (user: Object) => {
-//   try {
-//     const response = await Api.post(userEndpoints.signUpLast, user);
-//     return response;
-//   } catch (error) {
-//     if (error && (error as AxiosError).isAxiosError) {
-//       console.log(error);
-//     } else {
-//       toast.error("Something went wrong");
-//     }
-//   }
-// };
+export const signupVerification = async (user: Object) => {
+  try {
+    const response = await Api.post(userEndpoints.signupVerification, user);
+    return response;
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+};
 
 export const login = async (loginData: Object) => {
     try {
         const response = await Api.post(userEndpoints.login, loginData);
-        return response.data;
+        return response;
     } catch (error) {
         console.error("Login failed:", error);
         throw error;

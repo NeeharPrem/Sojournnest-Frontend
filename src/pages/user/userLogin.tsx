@@ -5,7 +5,9 @@ const UserLogin = () => {
   return (
     <>
       <Navbar/>
-      <SignUp/>
+      <div>
+        <SignUp />
+      </div>
     </>
   );
 };

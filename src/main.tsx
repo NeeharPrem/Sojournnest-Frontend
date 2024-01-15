@@ -7,7 +7,8 @@ import App from './App.tsx'
 import "./index.css"
 import { Provider } from 'react-redux';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { ToastContainer } from "react-toastify";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const Google_Client_Id = import.meta.env.VITE_GOOGLE_CLIENT_ID
 
 const queryClient = new QueryClient();

@@ -4,7 +4,6 @@ import { updateProfile } from "../../api/userapi";
 import { useMutation } from "@tanstack/react-query";
 
 interface ProfileBody {
-  re
   userInfo: {
     fname: string;
     lname: string;
@@ -17,11 +16,14 @@ interface ProfileBody {
 const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
   const [isNameEditing, setIsNameEditing] = useState(false);
   const [isMobileEditing, setIsMobileEditing] = useState(false);
+  const [isPassEditing, setIsPassEditing] = useState(false);
   const [firstName, setFirstName] = useState(userInfo.fname);
   const [lastName, setLastName] = useState(userInfo.lname);
   const [email, setEmail] = useState(userInfo.email);
   const [mobile, setMobile] = useState(userInfo.mobile);
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
+  const [oldpass, setOldPass] = useState("");
+  const [newpass, setNewPass] = useState("");
 
 
   useEffect(() => {
@@ -37,6 +39,16 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
 
   const handleMobileEditClick = () => {
     setIsMobileEditing(true);
+  };
+
+  const handlePassEditClick = () => {
+    setIsPassEditing(true);
+  };
+
+  const handleCancelClick = () => {
+    setIsNameEditing(false);
+    setIsMobileEditing(false);
+    setIsPassEditing(false);
   };
 
   const handleNameSaveClick = async () => {
@@ -62,6 +74,14 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
     }
   };
 
+  const handlePassSaveClick = () => {
+    const formData = new FormData()
+    formData.append("password",oldpass)
+    formData.append("newPassword",newpass)
+    update(formData)
+    setIsPassEditing(false);
+  };
+
   const handleAvatarChange = (files: FileList | null) => {
     if (files && files.length > 0) {
       setSelectedAvatar(files[0]);
@@ -85,7 +105,8 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
 
   const { mutate: update } = useMutation({
     mutationFn: updateProfile,
-    onSuccess: () => {
+    onSuccess: (response) => {
+      if(response)
       refetch()
     },
   });
@@ -118,9 +139,16 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
                 )}
               </div>
               {isNameEditing ? (
-                <button className="font-medium text-black px-3 py-1 underline" onClick={handleNameSaveClick}>
-                  save
-                </button>
+                <>
+                  <div className="flex flex-col">
+                    <button className="font-medium text-black px-3 py-1 underline" onClick={handleNameSaveClick}>
+                      save
+                    </button>
+                    <button className="font-medium text-black px-3 py-1 underline" onClick={handleCancelClick}>
+                      cancel
+                    </button>
+                  </div>
+                </>
               ) : (
                 <button className="font-medium text-black px-3 py-1 underline" onClick={handleNameEditClick}>
                   edit
@@ -150,11 +178,57 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
                 )}
               </div>
               {isMobileEditing ? (
-                <button className="font-medium text-black px-3 py-1 underline" onClick={handleMobileSaveClick}>
-                  save
-                </button>
+                <>
+                  <div className="flex flex-col">
+                    <button className="font-medium text-black px-3 py-1 underline" onClick={handleMobileSaveClick}>
+                      save
+                    </button>
+                    <button className="font-medium text-black px-3 py-1 underline" onClick={handleCancelClick}>
+                      cancel
+                    </button>
+                  </div>
+                </>
               ) : (
                 <button className="font-medium text-black px-3 py-1 underline" onClick={handleMobileEditClick}>
+                  edit
+                </button>
+              )}
+            </div>
+            <div className="border-b p-5 flex items-center justify-between">
+              <div>
+                <div className="font-bold text-lg">Password</div>
+                {isPassEditing ? (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Old password"
+                      onChange={(e) => setOldPass(e.target.value)}
+                      className="border p-1"
+                    />
+                    <input
+                      type="text"
+                      placeholder="New password"
+                      onChange={(e) => setNewPass(e.target.value)}
+                      className="border p-1 ml-2"
+                    />
+                  </>
+                ) : (
+                  <div className="pt-2"></div>
+                )}
+              </div>
+              {isPassEditing ? (
+                <>
+                  <div className="flex flex-col">
+                    <button className="font-medium text-black px-3 py-1 underline" onClick={handlePassSaveClick}>
+                      save
+                    </button>
+                    <button className="font-medium text-black px-3 py-1 underline" onClick={handleCancelClick}>
+                      cancel
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <button className="font-medium text-black px-3 py-1 underline" onClick={handlePassEditClick}>
                   edit
                 </button>
               )}

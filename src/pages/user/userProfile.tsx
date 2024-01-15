@@ -34,7 +34,6 @@ const UserProfile = () => {
           </div>
           <ProfileBody refetch={refetch} isLoading={isLoading} userInfo={userInfo}/>
       </div>
-      
     </>
   );
 };
