@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../api/userapi';
@@ -36,6 +37,15 @@ const Navbar = () => {
           </Link>
         </div>
         <div className="space-x-4">
+          {userLoggedin && location.pathname !== '/host' ? (
+            <Link to="/host" className="text-black hover:text-gray-300">
+              Switch to Host
+            </Link>
+          ) : userLoggedin ? (
+            <Link to="/" className="text-black hover:text-gray-300">
+              Switch to Tourist
+            </Link>
+          ) : null}
           {userLoggedin && location.pathname !== '/profile' ? (
             <>
               <Link to="/profile" className="text-black hover:text-gray-300">
@@ -46,15 +56,15 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-              userLoggedin ? (  
-                <button type="button" onClick={handleLogout}>
-                  Logout
-                </button>
-              ) : (
-                <Link to="/login" className="text-black hover:text-gray-300">
-                  Login
-                </Link>
-              )
+            userLoggedin ? (
+              <button type="button" onClick={handleLogout}>
+                Logout
+              </button>
+            ) : (
+              <Link to="/login" className="text-black hover:text-gray-300">
+                Login
+              </Link>
+            )
           )}
         </div>
       </div>

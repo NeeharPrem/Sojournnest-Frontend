@@ -5,7 +5,9 @@ const UserHome = () => {
   return (
     <>
       <Navbar/>
-      <HomePage/>
+      <div className="mt-10">
+        <HomePage />
+      </div>
     </>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { GoogleLogin} from "@react-oauth/google";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { login,signup} from "../../api/userapi";

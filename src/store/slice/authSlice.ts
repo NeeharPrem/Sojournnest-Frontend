@@ -1,14 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-interface initialState {
+interface AuthState {
   userLoggedin: boolean | null;
+  adminLoggedin: boolean | null;
 }
 
 const storedUserinfo = localStorage.getItem('userLoggedin');
-const parsedUsernfo = storedUserinfo ? JSON.parse(storedUserinfo) : null;
+const parsedUserinfo = storedUserinfo ? JSON.parse(storedUserinfo) : null;
 
-const initialState: initialState = {
-  userLoggedin:parsedUsernfo
+const storedAdmininfo = localStorage.getItem('adminLoggedin');
+const parsedAdmininfo = storedAdmininfo ? JSON.parse(storedAdmininfo) : null;
+
+const initialState: AuthState = {
+  userLoggedin: parsedUserinfo ?? null,
+  adminLoggedin: parsedAdmininfo ?? null,
 };
 
 const authSlice = createSlice({
@@ -23,8 +28,16 @@ const authSlice = createSlice({
       state.userLoggedin = false;
       localStorage.removeItem('userLoggedin');
     },
+    adminLogin: (state, action) => {
+      state.adminLoggedin = action.payload;
+      localStorage.setItem('adminLoggedin', JSON.stringify(action.payload));
+    },
+    adminLogout: (state) => {
+      state.adminLoggedin = false;
+      localStorage.removeItem('adminLoggedin');
+    }
   },
 });
 
-export const { setLogin, userLogout } = authSlice.actions;
+export const { setLogin, userLogout, adminLogin } = authSlice.actions;
 export default authSlice.reducer;

@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { userProfile } from "../../api/userapi";
 
 const UserProfile = () => {
-  const [profileBodyChanges, setProfileBodyChanges] = useState(0);
+  const [profileBodyChanges] = useState(0);
   
   const { data: userData, isLoading, refetch } = useQuery({
     queryKey: ['userData'],
@@ -21,9 +21,9 @@ const UserProfile = () => {
     profilePic:userData?.data?.profilePic,
   };
 
-  const handleProfileBodyChange = () => {
-    setProfileBodyChanges(prevChanges => prevChanges + 1);
-  };
+  // const handleProfileBodyChange = () => {
+  //   setProfileBodyChanges(prevChanges => prevChanges + 1);
+  // };
 
   return (
     <>
