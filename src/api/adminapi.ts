@@ -6,13 +6,51 @@ import Api from "../services/api";
 export const login = async (admin:Object)=>{
     try {
         const response= await Api.post(adminEndpoints.login,admin)
-        console.log(response)
         return response
     } catch (error) {
         if (error && (error as AxiosError).isAxiosError) {
             console.log(error);
         } else {
             toast.error("Something went wrong");
+        }
+    }
+}
+
+// export const logout= async(admin:Object)=>{
+//     try {
+//         const response= await Api.post(adminEndpoints.logout)
+//         return response
+//     } catch (error) {
+//         if(error && (error as AxiosError).isAxiosError){
+//         console.log(error)
+//     }else{
+//         toast.error("Something went wrong")
+//     }
+// }
+// }
+
+export const allUsers= async (admin:Object)=>{
+    try {
+        const response = await Api.get(adminEndpoints.allUsers,admin)
+        return response
+    } catch (error) {
+        if (error && (error as AxiosError).isAxiosError) {
+            console.log(error)
+        } else {
+            toast.error("Something went wrong")
+        }
+    }
+}
+
+export const blockUser = async (id: string) => {
+    try {
+        const response = await Api.post(`${adminEndpoints.blockUser}/${id}`)
+        return response
+    } catch (error) {
+        if (error && (error as AxiosError).isAxiosError) {
+            console.log(error)
+        } else {
+            toast.error("Something went wrong")
         }
     }
 }
