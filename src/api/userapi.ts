@@ -69,3 +69,13 @@ export const updateProfile = async (userData: FormData) => {
       throw error;
     }
 };
+
+export const addRoom = async (roomData: FormData) => {
+  try {
+    const response = await Api.put(userEndpoints.addRoom, roomData);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}

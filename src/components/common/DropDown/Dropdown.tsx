@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 
-const Dropdown: React.FC = () => {
+interface DropdownProps {
+    options: string[];
+    onSelect: (selectedValue: string) => void;
+    label: string;
+}
+
+const Dropdown: React.FC<DropdownProps> = ({ options, onSelect, label }) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<string>('');
 
@@ -11,14 +17,13 @@ const Dropdown: React.FC = () => {
     const selectOption = (option: string) => {
         setSelectedOption(option);
         setIsOpen(false);
+        onSelect(option);
     };
-
-    const options: string[] = ['Option 1', 'Option 2', 'Option 3'];
 
     return (
         <div className="relative">
             <label htmlFor="dropdown" className="sr-only">
-                Select an option
+                {label}
             </label>
             <button
                 id="dropdown"
@@ -26,8 +31,9 @@ const Dropdown: React.FC = () => {
                 onClick={toggleDropdown}
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
+                type="button"
             >
-                {selectedOption || 'Select an option'}
+                {selectedOption || "Choose"}
                 <svg
                     className={`w-5 h-5 ml-2 transition-transform duration-200 ease-in-out transform ${isOpen ? 'rotate-180' : 'rotate-0'
                         }`}

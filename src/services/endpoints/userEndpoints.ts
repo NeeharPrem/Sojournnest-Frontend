@@ -4,7 +4,8 @@ const userEndpoints={
     login: "/user/login",
     logout:"/user/logout",
     profile:"/user/profile",
-    updateProfile:"/user/updateProfile"
+    updateProfile:"/user/updateProfile",
+    addRoom:"/user/addRoom"
 }
 
 export default userEndpoints;

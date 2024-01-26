@@ -54,3 +54,29 @@ export const blockUser = async (id: string) => {
         }
     }
 }
+
+export const allListings = async (admin: Object) => {
+    try {
+        const response = await Api.get(adminEndpoints.allListings, admin)
+        return response
+    } catch (error) {
+        if (error && (error as AxiosError).isAxiosError) {
+            console.log(error)
+        } else {
+            toast.error("Something went wrong")
+        }
+    }
+}
+
+export const blockListing = async (id: string) => {
+    try {
+        const response = await Api.post(`${adminEndpoints.blockListing}/${id}`)
+        return response
+    } catch (error) {
+        if (error && (error as AxiosError).isAxiosError) {
+            console.log(error)
+        } else {
+            toast.error("Something went wrong")
+        }
+    }
+}

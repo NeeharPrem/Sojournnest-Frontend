@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 const sidebarItems = [
     { id: 1, label: 'Dashboard', link: '/admin/dashboard' },
     { id: 2, label: 'Users', link: '/admin/users' },
-    { id: 3, label: 'Stays', link: '/admin/stays' },
+    { id: 3, label: 'Listings', link: '/admin/listings' },
 ];
 
 const AdminSidebar = () => {
@@ -29,3 +29,25 @@ const AdminSidebar = () => {
 };
 
 export default AdminSidebar;
+// import React, { useState } from 'react';
+
+// const Sidebar = () => {
+//     const [isOpen, setIsOpen] = useState(true);
+//     const toggleSidebar = () => setIsOpen(!isOpen);
+
+//     return (
+//         <div className={`fixed inset-y-0 left-0 z-30 w-64 transition duration-300 ease-in-out transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+//             <div className="flex items-center justify-between p-4 bg-gray-800 text-white">
+//                 <span className="text-lg font-semibold">Admin Dashboard</span>
+//                 <button onClick={toggleSidebar} className="text-white focus:outline-none md:hidden">
+//                     {/* Icon for closing sidebar */}
+//                 </button>
+//             </div>
+//             <nav className="px-4 py-2">
+//                 {/* Navigation links */}
+//             </nav>
+//         </div>
+//     );
+// };
+
+// export default Sidebar;
