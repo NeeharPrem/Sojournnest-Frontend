@@ -1,9 +1,7 @@
 import AdminSidebar from "../../components/admin/AdminSidebar";
 
 const AdminDash = () => {
-    return (
-        <AdminSidebar />
-    );
+  return <AdminSidebar />;
 };
 
 export default AdminDash;

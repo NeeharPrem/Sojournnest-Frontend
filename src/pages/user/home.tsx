@@ -4,7 +4,7 @@ import HomePage from "../../components/user/Home";
 const UserHome = () => {
   return (
     <>
-      <Navbar/>
+      <Navbar />
       <div className="mt-10">
         <HomePage />
       </div>

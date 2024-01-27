@@ -7,18 +7,22 @@ import { userProfile } from "../../api/userapi";
 
 const UserProfile = () => {
   const [profileBodyChanges] = useState(0);
-  
-  const { data: userData, isLoading, refetch } = useQuery({
-    queryKey: ['userData'],
+
+  const {
+    data: userData,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["userData"],
     queryFn: userProfile,
   });
 
   const userInfo = {
-    fname: userData?.data?.fname || '',
-    lname: userData?.data?.lname || '',
-    email: userData?.data?.email || '',
-    mobile: userData?.data?.mobile || '',
-    profilePic:userData?.data?.profilePic,
+    fname: userData?.data?.fname || "",
+    lname: userData?.data?.lname || "",
+    email: userData?.data?.email || "",
+    mobile: userData?.data?.mobile || "",
+    profilePic: userData?.data?.profilePic,
   };
 
   // const handleProfileBodyChange = () => {
@@ -27,12 +31,19 @@ const UserProfile = () => {
 
   return (
     <>
-      <Navbar/>
+      <Navbar />
       <div className="lg:flex flex-row justify-evenly mt-10 pb-20 lg:pt-10 pt-7 px-5 md:px-14 xl:px-28">
-          <div className="lg:flex lg:items-center">
-          <ProfileMenu userInfo={userInfo} profileBodyChanges={profileBodyChanges} />
-          </div>
-          <ProfileBody refetch={refetch} isLoading={isLoading} userInfo={userInfo}/>
+        <div className="lg:flex lg:items-center">
+          <ProfileMenu
+            userInfo={userInfo}
+            profileBodyChanges={profileBodyChanges}
+          />
+        </div>
+        <ProfileBody
+          refetch={refetch}
+          isLoading={isLoading}
+          userInfo={userInfo}
+        />
       </div>
     </>
   );

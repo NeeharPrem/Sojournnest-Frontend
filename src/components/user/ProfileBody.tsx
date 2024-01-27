@@ -1,4 +1,4 @@
-import { useState,useEffect} from "react";
+import { useState, useEffect } from "react";
 import Loader from "../common/Loader";
 import { updateProfile } from "../../api/userapi";
 import { useMutation } from "@tanstack/react-query";
@@ -10,10 +10,14 @@ interface ProfileBody {
     email: string;
     mobile: string;
   };
-  isLoading:boolean
+  isLoading: boolean;
 }
 
-const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
+const ProfileBody: React.FC<ProfileBody> = ({
+  refetch,
+  userInfo,
+  isLoading,
+}) => {
   const [isNameEditing, setIsNameEditing] = useState(false);
   const [isMobileEditing, setIsMobileEditing] = useState(false);
   const [isPassEditing, setIsPassEditing] = useState(false);
@@ -24,7 +28,6 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
   const [oldpass, setOldPass] = useState("");
   const [newpass, setNewPass] = useState("");
-
 
   useEffect(() => {
     setFirstName(userInfo.fname);
@@ -56,18 +59,18 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
       const formData = new FormData();
       formData.append("fname", firstName);
       formData.append("lname", lastName);
-      update(formData)
+      update(formData);
       setIsNameEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
     }
   };
 
-  const handleMobileSaveClick =async () => {
+  const handleMobileSaveClick = async () => {
     try {
-      const formData = new FormData()
-      formData.append("mobile", mobile)
-      update(formData)
+      const formData = new FormData();
+      formData.append("mobile", mobile);
+      update(formData);
       setIsMobileEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -75,10 +78,10 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
   };
 
   const handlePassSaveClick = () => {
-    const formData = new FormData()
-    formData.append("password",oldpass)
-    formData.append("newPassword",newpass)
-    update(formData)
+    const formData = new FormData();
+    formData.append("password", oldpass);
+    formData.append("newPassword", newpass);
+    update(formData);
     setIsPassEditing(false);
   };
 
@@ -95,7 +98,7 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
       if (selectedAvatar) {
         const formData = new FormData();
         formData.append("avatar", selectedAvatar);
-        update(formData)
+        update(formData);
         setSelectedAvatar(null);
       }
     } catch (error) {
@@ -106,8 +109,7 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
   const { mutate: update } = useMutation({
     mutationFn: updateProfile,
     onSuccess: (response) => {
-      if(response)
-      refetch()
+      if (response) refetch();
     },
   });
 
@@ -115,7 +117,7 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
     <>
       <div className="lg:border-l w-full">
         <div className="flex flex-col md:flex-row bg-white p-10">
-        <div className="flex flex-col md:w-2/5 lg:w-full">
+          <div className="flex flex-col md:w-2/5 lg:w-full">
             <div className="border-b p-5 flex items-center justify-between">
               <div>
                 <div className="font-bold text-lg">Name</div>
@@ -141,16 +143,25 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
               {isNameEditing ? (
                 <>
                   <div className="flex flex-col">
-                    <button className="font-medium text-black px-3 py-1 underline" onClick={handleNameSaveClick}>
+                    <button
+                      className="font-medium text-black px-3 py-1 underline"
+                      onClick={handleNameSaveClick}
+                    >
                       save
                     </button>
-                    <button className="font-medium text-black px-3 py-1 underline" onClick={handleCancelClick}>
+                    <button
+                      className="font-medium text-black px-3 py-1 underline"
+                      onClick={handleCancelClick}
+                    >
                       cancel
                     </button>
                   </div>
                 </>
               ) : (
-                <button className="font-medium text-black px-3 py-1 underline" onClick={handleNameEditClick}>
+                <button
+                  className="font-medium text-black px-3 py-1 underline"
+                  onClick={handleNameEditClick}
+                >
                   edit
                 </button>
               )}
@@ -158,7 +169,7 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
             <div className="border-b p-5 flex items-center justify-between">
               <div>
                 <div className="font-bold text-lg">Email</div>
-                  <div className="pt-2">{`${email}`}</div>
+                <div className="pt-2">{`${email}`}</div>
               </div>
             </div>
             <div className="border-b p-5 flex items-center justify-between">
@@ -180,16 +191,25 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
               {isMobileEditing ? (
                 <>
                   <div className="flex flex-col">
-                    <button className="font-medium text-black px-3 py-1 underline" onClick={handleMobileSaveClick}>
+                    <button
+                      className="font-medium text-black px-3 py-1 underline"
+                      onClick={handleMobileSaveClick}
+                    >
                       save
                     </button>
-                    <button className="font-medium text-black px-3 py-1 underline" onClick={handleCancelClick}>
+                    <button
+                      className="font-medium text-black px-3 py-1 underline"
+                      onClick={handleCancelClick}
+                    >
                       cancel
                     </button>
                   </div>
                 </>
               ) : (
-                <button className="font-medium text-black px-3 py-1 underline" onClick={handleMobileEditClick}>
+                <button
+                  className="font-medium text-black px-3 py-1 underline"
+                  onClick={handleMobileEditClick}
+                >
                   edit
                 </button>
               )}
@@ -219,16 +239,25 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
               {isPassEditing ? (
                 <>
                   <div className="flex flex-col">
-                    <button className="font-medium text-black px-3 py-1 underline" onClick={handlePassSaveClick}>
+                    <button
+                      className="font-medium text-black px-3 py-1 underline"
+                      onClick={handlePassSaveClick}
+                    >
                       save
                     </button>
-                    <button className="font-medium text-black px-3 py-1 underline" onClick={handleCancelClick}>
+                    <button
+                      className="font-medium text-black px-3 py-1 underline"
+                      onClick={handleCancelClick}
+                    >
                       cancel
                     </button>
                   </div>
                 </>
               ) : (
-                <button className="font-medium text-black px-3 py-1 underline" onClick={handlePassEditClick}>
+                <button
+                  className="font-medium text-black px-3 py-1 underline"
+                  onClick={handlePassEditClick}
+                >
                   edit
                 </button>
               )}
@@ -247,7 +276,7 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
               </div>
               {selectedAvatar && (
                 <div className="ml-2">
-                <span className="font-medium">{selectedAvatar.name}</span>
+                  <span className="font-medium">{selectedAvatar.name}</span>
                 </div>
               )}
               <button
@@ -257,10 +286,10 @@ const ProfileBody: React.FC<ProfileBody> = ({refetch,userInfo,isLoading}) => {
                 Save
               </button>
             </div>
+          </div>
         </div>
       </div>
-      </div>
-      {isLoading&& <Loader/>}
+      {isLoading && <Loader />}
     </>
   );
 };

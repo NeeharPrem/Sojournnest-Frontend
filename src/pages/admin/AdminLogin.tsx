@@ -4,22 +4,21 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AdminLogin = () => {
+  const navigate = useNavigate();
+  const { adminLoggedin } = useSelector((state: any) => state.auth);
 
-    const navigate= useNavigate()
-    const { adminLoggedin } = useSelector((state: any) => state.auth)
-
-    useEffect(() => {
-        if (adminLoggedin) {
-            navigate("/admin/dashboard")
-        }
-    }, [])
-    return (
-        <> 
-            <div>
-                <Login />
-            </div>
-        </>
-    );
+  useEffect(() => {
+    if (adminLoggedin) {
+      navigate("/admin/dashboard");
+    }
+  }, []);
+  return (
+    <>
+      <div>
+        <Login />
+      </div>
+    </>
+  );
 };
 
 export default AdminLogin;

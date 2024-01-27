@@ -4,7 +4,7 @@ import SignUp from "../../components/user/SignUp";
 const UserLogin = () => {
   return (
     <>
-      <Navbar/>
+      <Navbar />
       <div>
         <SignUp />
       </div>

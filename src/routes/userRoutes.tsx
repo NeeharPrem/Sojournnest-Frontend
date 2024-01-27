@@ -10,10 +10,10 @@ const UserRoutes = () => {
     <Routes>
       <Route path="/" element={<UserHome />} />
       <Route path="signup" element={<SignUp />} />
-      <Route path="/profile" element={<UserProfile />}/>
-      <Route path="/login" element={<SignUp/>}></Route>
+      <Route path="/profile" element={<UserProfile />} />
+      <Route path="/login" element={<SignUp />}></Route>
       <Route path="/host" element={<HostHome />}></Route>
-      <Route path="/location" element={<SelectLocation/>}></Route>
+      <Route path="/location" element={<SelectLocation />}></Route>
     </Routes>
   );
 };

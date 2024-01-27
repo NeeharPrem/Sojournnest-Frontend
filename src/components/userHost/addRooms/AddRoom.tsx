@@ -1,35 +1,77 @@
-import React, { useState } from 'react';
-import AddLocation from '../addLocation/AddLocation';
+import React, { useState } from "react";
+import AddLocation from "../addLocation/AddLocation";
 import { BiReset } from "react-icons/bi";
-import Dropdown from '../../common/DropDown/Dropdown';
+import Dropdown from "../../common/DropDown/Dropdown";
 import { toast } from "react-toastify";
-import { useMutation } from '@tanstack/react-query';
-import StateDistrictDropdown from '../../common/DropDown/StateDistrictDropdown';
-import { useNavigate } from 'react-router-dom';
-import { addRoom } from '../../../api/userapi';
+import { useMutation } from "@tanstack/react-query";
+import StateDistrictDropdown from "../../common/DropDown/StateDistrictDropdown";
+import { useNavigate } from "react-router-dom";
+import { addRoom } from "../../../api/userapi";
+import { updateRoom } from "../../../api/userapi";
 
 interface Location {
   longitude: number;
   latitude: number;
 }
-const AddRoom: React.FC = () => {
-  const [showMap, setShowMap] = useState<boolean>(false);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
-  const [newAmenity, setNewAmenity] = useState<string>('');
-  const [showAmenityField, setShowAmenityField] = useState<boolean>(false);
-  const [amenities, setAmenities] = useState<string[]>([]);
-  const [roomImages, setRoomImages] = useState<File[]>([]);
-  const [selectedState, setSelectedState] = useState<string>('');
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
-  const [seletctedCategory, setCategory] = useState<string>('');
 
-  const navigate = useNavigate()
+interface AddRoomProps {
+  mode: "add" | "edit";
+  initialData?: any;
+}
+
+const AddRoom: React.FC<AddRoomProps> = ({ mode, initialData }) => {
+  const [showMap, setShowMap] = useState<boolean>(false);
+  // const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+  //   null,
+  // );
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+    mode === "edit" ? initialData.location : null,
+  );
+  const [newAmenity, setNewAmenity] = useState<string>("");
+  const [showAmenityField, setShowAmenityField] = useState<boolean>(false);
+  const [amenities, setAmenities] = useState<string[]>(
+    mode === "edit" ? initialData.amenities : []
+  );
+  const [roomImages, setRoomImages] = useState<File[]>(
+    mode === "edit" ? initialData.roomImages : []
+  );
+  const [selectedState, setSelectedState] = useState<string>(
+    mode === "edit" ? initialData.selectedState : ""
+  );
+  const [selectedDistrict, setSelectedDistrict] = useState<string>(
+    mode === "edit" ? initialData.selectedDistrict : ""
+  );
+  const [seletctedCategory, setCategory] = useState<string>(
+    mode === "edit" ? initialData.seletctedCategory : ""
+  );
+  const [Nname, setName] = useState<string>(
+    mode === "edit" ? initialData.Nname : ""
+  );
+  const [Nbedrooms, setBedrooms] = useState<string>(
+    mode === "edit" ? initialData.Nbedrooms : ""
+  );
+  const [Nbathrooms, setBathrooms] = useState<string>(
+    mode === "edit" ? initialData.Nbathrooms : ""
+  );
+  const [Nguests, setGuests] = useState<string>(
+    mode === "edit" ? initialData.Nguests : ""
+  );
+  const [Nsubdescription, setSubdescription] = useState<string>(
+    mode === "edit" ? initialData.Nsubdescription : ""
+  );
+  const [Nrent, setRent] = useState<string>(
+    mode === "edit" ? initialData.Nrent : ""
+  );
+  const [Ndescription, setDescription] = useState<string>(
+    mode === "edit" ? initialData.Ndescription : ""
+  );
+
+  const navigate = useNavigate();
 
   const handleSelectState = (state: string, district: string) => {
     setSelectedState(state);
     setSelectedDistrict(district);
   };
-
 
   const handlePlusClick = () => {
     setShowAmenityField(!showAmenityField);
@@ -37,24 +79,27 @@ const AddRoom: React.FC = () => {
 
   const handleSaveClick = () => {
     setAmenities([...amenities, newAmenity]);
-    setNewAmenity('');
+    setNewAmenity("");
     setShowAmenityField(false);
   };
 
   const toggleMap = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     setShowMap(!showMap);
   };
 
-  const handleLocationSelect = (location: { longitude: number; latitude: number }) => {
+  const handleLocationSelect = (location: {
+    longitude: number;
+    latitude: number;
+  }) => {
     setSelectedLocation(location);
     setShowMap(false);
   };
 
-  const handleReset=()=>{
-    setSelectedLocation(null)
+  const handleReset = () => {
+    setSelectedLocation(null);
     setShowMap(!showMap);
-  }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -81,203 +126,214 @@ const AddRoom: React.FC = () => {
     e.preventDefault();
 
     //FormData
-    const formData = new FormData(e.currentTarget);
-    formData.append("latitude", selectedLocation?.latitude?.toString() || '')
-    formData.append("longitude", selectedLocation?.longitude?.toString() || '')
-    formData.append('amenities', JSON.stringify(amenities));
-    formData.append('state',selectedState)
-    formData.append('district',selectedDistrict)
-    formData.append('category',seletctedCategory)
+    const formData = new FormData();
+    roomImages.forEach(image => formData.append("images", image));
+    formData.append("name", Nname);
+    formData.append("bedrooms", Nbedrooms);
+    formData.append("bathrooms", Nbathrooms);
+    formData.append("guests", Nguests);
+    formData.append("subdescription", Nsubdescription);
+    formData.append("rent", Nrent);
+    formData.append("description", Ndescription);
+    formData.append("latitude", selectedLocation?.latitude?.toString() || "");
+    formData.append("longitude", selectedLocation?.longitude?.toString() || "");
+    formData.append("amenities", JSON.stringify(amenities));
+    formData.append("state", selectedState);
+    formData.append("district", selectedDistrict);
+    formData.append("category", seletctedCategory);
 
     // Form validation
-    const name = formData.get('name') as string;
-    const bedrooms = formData.get('bedrooms') as string;
-    const bathrooms = formData.get('bathrooms') as string;
-    const guests = formData.get('guests') as string;
-    const subdesciption = formData.get('subdescription') as string;
-    const rent = formData.get('rent')as string;
-    const description = formData.get('description')as string;
-    const Latitude=formData.get('latitude') as string;
-    const state= formData.get("state")as string;
-    const district = formData.get('district') as string;
-    const category= formData.get('category') as string;
+    const name = formData.get("name") as string;
+    const bedrooms = formData.get("bedrooms") as string;
+    const bathrooms = formData.get("bathrooms") as string;
+    const guests = formData.get("guests") as string;
+    const subdesciption = formData.get("subdescription") as string;
+    const rent = formData.get("rent") as string;
+    const description = formData.get("description") as string;
+    const Latitude = formData.get("latitude") as string;
+    const state = formData.get("state") as string;
+    const district = formData.get("district") as string;
+    const category = formData.get("category") as string;
 
     if (!name.trim()) {
-      toast.error("Name cannot be empty")
+      toast.error("Name cannot be empty");
       return;
     }
 
     if (/^\d+$/.test(name)) {
-      toast.error('Name cannot be a number')
+      toast.error("Name cannot be a number");
       return;
     }
 
     if (/^\s+$/.test(name)) {
-      toast.error('Name cannot contain only spaces');
+      toast.error("Name cannot contain only spaces");
       return;
     }
 
     if (/^[!@#$%^&*(),.?":{}|<>]+$/.test(name)) {
-      toast.error('Name cannot contain only special characters');
+      toast.error("Name cannot contain only special characters");
       return;
     }
 
     if (!bedrooms) {
-      toast.error('Add Bedrooms');
+      toast.error("Add Bedrooms");
       return;
     }
 
     if (!isNaN(Number(bedrooms)) && Number(bedrooms) >= 0) {
-    }else{
-      toast.error('Bedrooms ');
+    } else {
+      toast.error("Bedrooms ");
       return;
     }
 
     if (!bathrooms) {
-      toast.error('Add Bathrooms');
+      toast.error("Add Bathrooms");
       return;
     }
 
     if (!isNaN(Number(bathrooms)) && Number(bathrooms) >= 1) {
     } else {
-      toast.error('Bath count cannot be negative');
+      toast.error("Bath count cannot be negative");
       return;
     }
 
     if (!guests) {
-      toast.error('Guests cannot be empty');
+      toast.error("Guests cannot be empty");
       return;
     }
 
     if (!isNaN(Number(guests)) && Number(guests) > 0) {
     } else {
-      toast.error('Fill guest count properly');
+      toast.error("Fill guest count properly");
       return;
     }
 
-    if(!category){
-      toast.error('select a category')
-      return
+    if (!category) {
+      toast.error("select a category");
+      return;
     }
 
-    // if (!subdesciption.trim()) {
-    //   toast.error('Sub description cannot be empty');
-    //   return;
-    // }
-
     if (/^\d+$/.test(subdesciption)) {
-      toast.error('Sub description cannot be a number');
+      toast.error("Sub description cannot be a number");
       return;
     }
 
     if (/^\s+$/.test(subdesciption)) {
-      toast.error('Sub description cannot be empty');
+      toast.error("Sub description cannot be empty");
       return;
     }
 
     if (/^[!@#$%^&*(),.?":{}|<>]+$/.test(subdesciption)) {
-      toast.error('Sub description should contain letters');
+      toast.error("Sub description should contain letters");
       return;
     }
 
-    if(!state){
-      toast.error('Choose a state')
-      return
+    if (!state) {
+      toast.error("Choose a state");
+      return;
     }
 
     if (!district) {
-      toast.error('Choose a district')
-      return
+      toast.error("Choose a district");
+      return;
     }
 
     if (!rent) {
-      toast.error('Rent cannot be empty');
+      toast.error("Rent cannot be empty");
       return;
     }
 
     if (!isNaN(Number(rent)) && Number(rent) >= 0) {
     } else {
-      toast.error('Rent is negative or not a number');
+      toast.error("Rent is negative or not a number");
       return;
     }
 
     if (!description.trim()) {
-      toast.error("Description cannot be empty")
+      toast.error("Description cannot be empty");
       return;
     }
 
     if (/^\d+$/.test(description)) {
-      toast.error('Description cannot be a number')
+      toast.error("Description cannot be a number");
       return;
     }
 
     if (/^\s+$/.test(description)) {
-      toast.error('Description cannot contain only spaces');
+      toast.error("Description cannot contain only spaces");
       return;
     }
 
     if (/^[!@#$%^&*(),.?":{}|<>]+$/.test(description)) {
-      toast.error('Only special character not allowed');
+      toast.error("Only special character not allowed");
       return;
     }
 
-    const imageArray = formData.getAll('image');
+    const imageArray = formData.getAll("image");
     if (imageArray) {
       if (Array.isArray(imageArray)) {
         for (const image of imageArray) {
           if (image instanceof File) {
-            console.log('File name:', image.name);
+            console.log("File name:", image.name);
           } else {
-            console.error('Invalid image');
+            console.error("Invalid image");
             return;
           }
         }
       } else {
-        toast.error('Invalid image type');
+        toast.error("Invalid image type");
         return;
       }
     } else {
-      toast.error('Select atleast one image');
+      toast.error("Select atleast one image");
       return;
     }
 
-    const amenitiesArray = formData.get('amenities');
-    console.log(amenitiesArray)
-    if (amenitiesArray && typeof amenitiesArray === 'string') {
+    const amenitiesArray = formData.get("amenities");
+    console.log(amenitiesArray);
+    if (amenitiesArray && typeof amenitiesArray === "string") {
       const parsedAmenities = JSON.parse(amenitiesArray);
       if (Array.isArray(parsedAmenities) && parsedAmenities.length > 0) {
       } else {
-        toast.error('Please select at least one amenity 1');
+        toast.error("Please select at least one amenity 1");
         return;
       }
     } else {
-      toast.error('Please select at least one amenity 2');
+      toast.error("Please select at least one amenity 2");
       return;
     }
 
     if (!Latitude) {
-      toast.error('Select a Location');
+      toast.error("Select a Location");
       return;
     }
 
     if (!isNaN(Number(Latitude)) && Number(Latitude) != null) {
     } else {
-      toast.error('Select a Location');
+      toast.error("Select a Location");
       return;
     }
-    console.log(formData)
-  
-    roomData(formData)
-   
+    if(mode=="add"){
+      roomData(formData);
+    }
+    if(mode=="edit"){
+      updateData(formData)
+    }
   };
-
   const { mutate: roomData } = useMutation({
     mutationFn: addRoom,
     onSuccess: (response) => {
-      if (response.status==200)
-      console.log(response)
-        navigate('/host')
-    },
+      if (response.status == 200) console.log(response);
+      navigate("/host");
+    }
+  });
+
+  const { mutate: updateData } = useMutation({
+    mutationFn: updateRoom,
+    onSuccess: (response) => {
+      if (response.status == 200) console.log(response);
+      navigate("/host");
+    }
   });
 
   return (
@@ -286,7 +342,7 @@ const AddRoom: React.FC = () => {
         <div className="bg-white p-10  shadow-lg">
           <h1 className="text-3xl font-bold mb-4">Add Your Property</h1>
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className='flex flex-row justify-between'>
+            <div className="flex flex-row justify-between">
               <div className="items-center">
                 <label htmlFor="name" className="block text-gray-800 w-1/4">
                   Name
@@ -297,10 +353,14 @@ const AddRoom: React.FC = () => {
                   name="name"
                   className="w-3/4 border border-gray-300 p-2 rounded-lg"
                   placeholder="Enter room name"
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
               <div className="items-center">
-                <label htmlFor="bedrooms" className="block text-gray-800  w-1/4">
+                <label
+                  htmlFor="bedrooms"
+                  className="block text-gray-800  w-1/4"
+                >
                   Bedrooms
                 </label>
                 <input
@@ -309,12 +369,16 @@ const AddRoom: React.FC = () => {
                   name="bedrooms"
                   className="w-3/4 border border-gray-300 p-2 rounded-lg appearance-none"
                   placeholder="Enter number of bedrooms"
+                  onChange={(e) => setBedrooms(e.target.value)}
                 />
               </div>
             </div>
-            <div className='flex flex-row gap-2 justify-between'>
+            <div className="flex flex-row gap-2 justify-between">
               <div className="items-center">
-                <label htmlFor="bathrooms" className="block text-gray-800 w-1/4">
+                <label
+                  htmlFor="bathrooms"
+                  className="block text-gray-800 w-1/4"
+                >
                   Bathrooms
                 </label>
                 <input
@@ -323,6 +387,7 @@ const AddRoom: React.FC = () => {
                   name="bathrooms"
                   className="w-3/4 border border-gray-300 p-2 rounded-lg appearance-none"
                   placeholder="Enter number of bathrooms"
+                  onChange={(e) => setBathrooms(e.target.value)}
                 />
               </div>
               <div className="items-center">
@@ -335,18 +400,23 @@ const AddRoom: React.FC = () => {
                   name="guests"
                   className="w-3/4 border border-gray-300 p-2 rounded-lg appearance-none"
                   placeholder="Enter number of guests"
+                  onChange={(e) => setGuests(e.target.value)}
                 />
               </div>
             </div>
-            <div className='flex-row justify-center gap-2'>
+            <div className="flex-row justify-center gap-2">
               <div className="items-center">
                 <label htmlFor="guests" className="block text-gray-800 w-30">
                   category
                 </label>
-                <Dropdown options={['Category 1', 'Category 2', 'Category 3']} onSelect={handleCategorySelect} label="Category" />
+                <Dropdown
+                  options={["Category 1", "Category 2", "Category 3"]}
+                  onSelect={handleCategorySelect}
+                  label="Category"
+                />
               </div>
             </div>
-            <div className='flex-row justify-center gap-2'>
+            <div className="flex-row justify-center gap-2">
               <div className="items-center">
                 <label htmlFor="guests" className="block text-gray-800 w-30">
                   Sub description
@@ -357,46 +427,54 @@ const AddRoom: React.FC = () => {
                   name="subdescription"
                   className="w-3/4 border border-gray-300 p-2 rounded-lg"
                   placeholder="Sub description"
+                  onChange={(e) => setSubdescription(e.target.value)}
                 />
               </div>
-              <div className='my-10'>
+              <div className="my-10">
                 <StateDistrictDropdown onSelectState={handleSelectState} />
               </div>
             </div>
-            <div className='flex-col justify-center gap-2'>
-              <div id="amenities" className='items-center'>
+            <div className="flex-col justify-center gap-2">
+              <div id="amenities" className="items-center">
                 {amenities.length > 0 && (
                   <>
                     <div>
-                      <label htmlFor="guests" className="block text-gray-800 w-30">
+                      <label
+                        htmlFor="guests"
+                        className="block text-gray-800 w-30"
+                      >
                         Selected amenities
                       </label>
                     </div>
-                    <div>
-                      {amenities.join(', ')}
-                    </div>
+                    <div>{amenities.join(", ")}</div>
                   </>
                 )}
               </div>
             </div>
-            <div className='flex-col justify-center gap-2'>
+            <div className="flex-col justify-center gap-2">
               <div className="items-center">
                 <label htmlFor="guests" className="block text-gray-800 w-30">
                   Amenities
                 </label>
-                <div className='flex flex-row gap-2'>
-                  <Dropdown options={['Option 1', 'Option 2', 'Option 3']} onSelect={handleAmenitySelect} label="Amenities" />
-                  <button type="button" onClick={handlePlusClick}>+</button>
+                <div className="flex flex-row gap-2">
+                  <Dropdown
+                    options={["Option 1", "Option 2", "Option 3"]}
+                    onSelect={handleAmenitySelect}
+                    label="Amenities"
+                  />
+                  <button type="button" onClick={handlePlusClick}>
+                    +
+                  </button>
                 </div>
               </div>
             </div>
             {showAmenityField && (
-            <div className='flex-col justify-center gap-2'>
-              <div className="items-center">
-                <label htmlFor="guests" className="block text-gray-800 w-30">
-                  Additional amenities
-                </label>
-                  <div className='flex flex-row gap-2'>
+              <div className="flex-col justify-center gap-2">
+                <div className="items-center">
+                  <label htmlFor="guests" className="block text-gray-800 w-30">
+                    Additional amenities
+                  </label>
+                  <div className="flex flex-row gap-2">
                     <input
                       className="w-3/4 border border-gray-300 p-2 rounded-lg"
                       type="text"
@@ -405,10 +483,10 @@ const AddRoom: React.FC = () => {
                     />
                     <button onClick={handleSaveClick}>Save</button>
                   </div>
+                </div>
               </div>
-            </div>
             )}
-            <div className='flex-col justify-center gap-2'>
+            <div className="flex-col justify-center gap-2">
               <div className="items-center">
                 <label htmlFor="guests" className="block text-gray-800 w-30">
                   Room rent
@@ -419,11 +497,15 @@ const AddRoom: React.FC = () => {
                   name="rent"
                   className="w-3/4 border border-gray-300 p-2 rounded-lg"
                   placeholder="Room rent"
+                  onChange={(e) => setRent(e.target.value)}
                 />
               </div>
             </div>
             <div className="items-center">
-              <label htmlFor="description" className="block text-gray-800 w-1/4">
+              <label
+                htmlFor="description"
+                className="block text-gray-800 w-1/4"
+              >
                 Description
               </label>
               <textarea
@@ -432,6 +514,7 @@ const AddRoom: React.FC = () => {
                 rows={5}
                 className="w-3/4 border border-gray-300 p-2 rounded-lg"
                 placeholder="Enter room description"
+                onChange={(e) => setDescription(e.target.value)}
               ></textarea>
             </div>
             <div className="items-center">
@@ -449,7 +532,9 @@ const AddRoom: React.FC = () => {
             </div>
             {roomImages.length > 0 && (
               <div className="flex items-center space-x-6">
-                <label className="block text-gray-800 w-1/4">Uploaded Images</label>
+                <label className="block text-gray-800 w-1/4">
+                  Uploaded Images
+                </label>
                 <div className="flex flex-wrap gap-2">
                   {roomImages.map((image, index) => (
                     <div key={index} className="relative">
@@ -469,7 +554,7 @@ const AddRoom: React.FC = () => {
                 </div>
               </div>
             )}
-            <div className='flex flex-row gap-5'>
+            <div className="flex flex-row gap-5">
               <div className="items-center">
                 <label htmlFor="location" className="block text-gray-800 w-1/4">
                   Location
@@ -477,21 +562,25 @@ const AddRoom: React.FC = () => {
                 {selectedLocation === null ? (
                   <>
                     {showMap ? (
-                      <button onClick={toggleMap} className='border p-2 rounded-md text-white bg-black'>
+                      <button
+                        onClick={toggleMap}
+                        className="border p-2 rounded-md text-white bg-black"
+                      >
                         Close Map
                       </button>
                     ) : (
-                      <button onClick={toggleMap} className='border p-2 rounded-md text-white bg-black'>
+                      <button
+                        onClick={toggleMap}
+                        className="border p-2 rounded-md text-white bg-black"
+                      >
                         Choose
                       </button>
                     )}
                   </>
                 ) : (
                   <>
-                    <div className='flex flex-row gap-5'>
-                      <div>
-                        Location selected
-                      </div>
+                    <div className="flex flex-row gap-5">
+                      <div>Location selected</div>
                       <div>
                         <BiReset onClick={handleReset} />
                       </div>

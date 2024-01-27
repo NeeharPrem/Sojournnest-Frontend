@@ -1,7 +1,7 @@
 import UserRoutes from "./routes/userRoutes";
 import AdminRoutes from "./routes/AdminRoutes";
 import { AdminPrivate } from "./components/common/PrivateRoute";
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from "react-router-dom";
 
 export default function App() {
   return (
@@ -10,10 +10,19 @@ export default function App() {
         <Route path="/admin/*" element={<AdminRoutes />} />
         <Route
           path="/dashboard"
-          element={<AdminPrivate><AdminRoutes /></AdminPrivate>}
-        /><Route
+          element={
+            <AdminPrivate>
+              <AdminRoutes />
+            </AdminPrivate>
+          }
+        />
+        <Route
           path="/users"
-          element={<AdminPrivate><AdminRoutes /></AdminPrivate>}
+          element={
+            <AdminPrivate>
+              <AdminRoutes />
+            </AdminPrivate>
+          }
         />
         <Route path="/*" element={<UserRoutes />} />
       </Routes>

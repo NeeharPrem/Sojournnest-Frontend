@@ -1,4 +1,4 @@
-import { useState} from "react";
+import { useState } from "react";
 
 interface ProfileMenu {
   userInfo: {
@@ -6,17 +6,15 @@ interface ProfileMenu {
     lname: string;
     email: string;
     mobile: string;
-    profilePic:string;
+    profilePic: string;
   };
-  profileBodyChanges:number;
+  profileBodyChanges: number;
 }
 
-const ProfileMenu: React.FC<ProfileMenu> = ({ userInfo}) => {
+const ProfileMenu: React.FC<ProfileMenu> = ({ userInfo }) => {
   const [selectedOption, setSelectedOption] = useState("Bookings");
   const [showOptions, setShowOptions] = useState(false);
 
-
-  
   const optionHandler = (val: string) => {
     // Handle the selected option if needed
   };
@@ -42,7 +40,7 @@ const ProfileMenu: React.FC<ProfileMenu> = ({ userInfo}) => {
             <div
               key={option.value}
               className={`py-3 border-b hover:bg-gray-100 transition-all duration-100 cursor-pointer ${
-                selectedOption === option.value && 'bg-gray-100'
+                selectedOption === option.value && "bg-gray-100"
               }`}
               onClick={() => {
                 setSelectedOption(option.value);
