@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ConfirmationModal from "../common/modal/confirmationModal";
 import { useMutation } from "@tanstack/react-query";
-import { unlistRoom } from "../../api/userapi";
+import { unlist } from "../../api/userapi";
 import Loader from "../common/Loader";
 import BorderColorSharpIcon from '@mui/icons-material/BorderColorSharp';
 import { Link } from "react-router-dom";
@@ -41,8 +41,8 @@ const ListingTable: React.FC<MyComponentProps> = ({
   //     }));
   // };
 
-  const { mutate: unlist } = useMutation({
-    mutationFn: unlistRoom,
+  const { mutate: unlistData } = useMutation({
+    mutationFn: unlist,
     onSuccess: (response) => {
       if (response) {
         refetch();
@@ -51,7 +51,7 @@ const ListingTable: React.FC<MyComponentProps> = ({
   });
 
   const handleConfirmation = () => {
-    unlist(selectedId);
+    unlistData(selectedId);
     setIsConfirmationModalOpen(false);
   };
 

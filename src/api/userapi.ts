@@ -89,9 +89,9 @@ export const getListings = async () => {
   }
 };
 
-export const unlistRoom = async (id: string) => {
+export const unlist = async (id: string) => {
   try {
-    const response = await Api.post(`${userEndpoints.unlistRoom}/${id}`);
+    const response = await Api.post(`${userEndpoints.unlist}/${id}`);
     return response;
   } catch (error) {
     if (error && (error as AxiosError).isAxiosError) {
