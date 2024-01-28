@@ -102,6 +102,19 @@ export const unlistRoom = async (id: string) => {
   }
 };
 
+export const roomData = async (id: string) => {
+  try {
+    const response = await Api.post(`${userEndpoints.roomData}/${id}`);
+    return response;
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+};
+
 export const updateRoom = async (updateData: FormData) => {
   try {
     const response = await Api.put(userEndpoints.updateRoom, updateData);

@@ -8,6 +8,7 @@ const userEndpoints = {
   addRoom: "/user/addRoom",
   getListings: "/user/getListings",
   unlistRoom: "/user/unlistRoom",
+  roomData:"/user/roomData",
   updateRoom:"/user/updateRoom"
 };
 

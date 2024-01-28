@@ -160,7 +160,7 @@ const ListingTable: React.FC<MyComponentProps> = ({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div className="text-sm text-gray-900">
-                        <Link to='/editRoom'>
+                        <Link to={`/editRoom/${room._id}`}>
                           <BorderColorSharpIcon />
                         </Link>
                       </div>
