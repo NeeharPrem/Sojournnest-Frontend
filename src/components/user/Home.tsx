@@ -1,3 +1,4 @@
+
 const hotels = [
   { id: 1, name: "Hotel A", image: "https://placekitten.com/300/200" },
   { id: 2, name: "Hotel B", image: "https://placekitten.com/301/200" },

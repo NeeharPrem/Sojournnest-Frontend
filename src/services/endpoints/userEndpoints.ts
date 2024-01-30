@@ -9,7 +9,8 @@ const userEndpoints = {
   getListings: "/user/getListings",
   unlist: "/user/unlist",
   roomData:"/user/roomData",
-  updateRoom:"/user/updateRoom"
+  roomDataUpdate:"/user/roomDataUpdate",
+  homeListings:"/user/homeListings"
 };
 
 export default userEndpoints;

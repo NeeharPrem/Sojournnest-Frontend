@@ -57,11 +57,9 @@ const OTPScreen: React.FC<OTPScreenProps> = ({
     onSuccess: (response) => {
       console.log(response);
       if (response?.status === 200) {
-        toast.success("Otp verified");
+        toast.success(response?.data?.message);
         setIsLogin(!isLogin);
         setIscomplete(false);
-      } else if (response?.status === 400) {
-        toast.error(response.data.message);
       }
     },
   });

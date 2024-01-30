@@ -13,7 +13,7 @@ interface StateDistrictDropdownProps {
 const url = "https://api.npoint.io/ebc716fd6e85da66e773";
 
 const StateDistrictDropdown: React.FC<StateDistrictDropdownProps> = ({
-  onSelectState,
+  onSelectState
 }) => {
   const [states, setStates] = useState<StateData[]>([]);
   const [districts, setDistricts] = useState<string[]>([]);
@@ -22,8 +22,6 @@ const StateDistrictDropdown: React.FC<StateDistrictDropdownProps> = ({
 
   const {
     data: userData,
-    isLoading,
-    refetch,
   } = useQuery({
     queryKey: ["userData"],
     queryFn: () => fetch(url).then((response) => response.json()),

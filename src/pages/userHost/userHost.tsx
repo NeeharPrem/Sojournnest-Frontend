@@ -31,5 +31,4 @@ const HostHome = () => {
     </>
   );
 };
-
 export default HostHome;
