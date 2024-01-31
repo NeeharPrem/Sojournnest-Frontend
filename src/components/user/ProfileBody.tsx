@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Loader from "../common/Loader";
 import { updateProfile } from "../../api/userapi";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 interface ProfileBody {
   userInfo: {
@@ -9,8 +10,11 @@ interface ProfileBody {
     lname: string;
     email: string;
     mobile: string;
+    id:string;
+    isgoogle:boolean;
   };
   isLoading: boolean;
+  refetch:any
 }
 
 const ProfileBody: React.FC<ProfileBody> = ({
@@ -54,34 +58,49 @@ const ProfileBody: React.FC<ProfileBody> = ({
     setIsPassEditing(false);
   };
 
-  const handleNameSaveClick = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("fname", firstName);
-      formData.append("lname", lastName);
-      update(formData);
-      setIsNameEditing(false);
-    } catch (error) {
-      console.error("Error updating profile:", error);
+  const handleNameSaveClick = () => {
+    if (!firstName || !lastName || !userInfo || !userInfo.id) {
+      toast.error("First and Last Name cannot be empty");
+      return;
     }
+    const formData = new FormData();
+    formData.append("fname", firstName);
+    formData.append("lname", lastName);
+    update({ id: userInfo.id, userData: formData });
+
+    setIsNameEditing(false);
   };
 
   const handleMobileSaveClick = async () => {
     try {
+      if (!mobile) {
+        toast.error('Fill in the mobile number');
+        return;
+      }
+      if (mobile.length !== 10) {
+        toast.error('Fill in the mobile number properly');
+        return;
+      }
       const formData = new FormData();
       formData.append("mobile", mobile);
-      update(formData);
+      update({ id: userInfo.id, userData: formData });
       setIsMobileEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
+      toast.error('Error updating profile');
     }
   };
 
+
   const handlePassSaveClick = () => {
+    if (!oldpass || !newpass) {
+      alert('Please enter both old and new passwords.');
+      return;
+    }
     const formData = new FormData();
     formData.append("password", oldpass);
     formData.append("newPassword", newpass);
-    update(formData);
+    update({ id: userInfo.id, userData: formData });
     setIsPassEditing(false);
   };
 
@@ -98,7 +117,7 @@ const ProfileBody: React.FC<ProfileBody> = ({
       if (selectedAvatar) {
         const formData = new FormData();
         formData.append("avatar", selectedAvatar);
-        update(formData);
+        update({ id: userInfo.id, userData: formData });
         setSelectedAvatar(null);
       }
     } catch (error) {
@@ -109,6 +128,7 @@ const ProfileBody: React.FC<ProfileBody> = ({
   const { mutate: update } = useMutation({
     mutationFn: updateProfile,
     onSuccess: (response) => {
+      toast.success("Profile Updated")
       if (response) refetch();
     },
   });
@@ -214,54 +234,56 @@ const ProfileBody: React.FC<ProfileBody> = ({
                 </button>
               )}
             </div>
-            <div className="border-b p-5 flex items-center justify-between">
-              <div>
-                <div className="font-bold text-lg">Password</div>
+           {userInfo.isgoogle == false && (
+              <div className="border-b p-5 flex items-center justify-between">
+                <div>
+                  <div className="font-bold text-lg">Password</div>
+                  {isPassEditing ? (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Old password"
+                        onChange={(e) => setOldPass(e.target.value)}
+                        className="border p-1"
+                      />
+                      <input
+                        type="text"
+                        placeholder="New password"
+                        onChange={(e) => setNewPass(e.target.value)}
+                        className="border p-1 ml-2"
+                      />
+                    </>
+                  ) : (
+                    <div className="pt-2"></div>
+                  )}
+                </div>
                 {isPassEditing ? (
                   <>
-                    <input
-                      type="text"
-                      placeholder="Old password"
-                      onChange={(e) => setOldPass(e.target.value)}
-                      className="border p-1"
-                    />
-                    <input
-                      type="text"
-                      placeholder="New password"
-                      onChange={(e) => setNewPass(e.target.value)}
-                      className="border p-1 ml-2"
-                    />
+                    <div className="flex flex-col">
+                      <button
+                        className="font-medium text-black px-3 py-1 underline"
+                        onClick={handlePassSaveClick}
+                      >
+                        save
+                      </button>
+                      <button
+                        className="font-medium text-black px-3 py-1 underline"
+                        onClick={handleCancelClick}
+                      >
+                        cancel
+                      </button>
+                    </div>
                   </>
                 ) : (
-                  <div className="pt-2"></div>
+                  <button
+                    className="font-medium text-black px-3 py-1 underline"
+                    onClick={handlePassEditClick}
+                  >
+                    edit
+                  </button>
                 )}
               </div>
-              {isPassEditing ? (
-                <>
-                  <div className="flex flex-col">
-                    <button
-                      className="font-medium text-black px-3 py-1 underline"
-                      onClick={handlePassSaveClick}
-                    >
-                      save
-                    </button>
-                    <button
-                      className="font-medium text-black px-3 py-1 underline"
-                      onClick={handleCancelClick}
-                    >
-                      cancel
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <button
-                  className="font-medium text-black px-3 py-1 underline"
-                  onClick={handlePassEditClick}
-                >
-                  edit
-                </button>
-              )}
-            </div>
+           )}
             <div className="border-b p-5 flex items-center justify-between">
               <div className="flex flex-col">
                 <div className="font-bold text-lg">Avatar</div>

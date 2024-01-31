@@ -7,7 +7,6 @@ import { userProfile } from "../../api/userapi";
 
 const UserProfile = () => {
   const [profileBodyChanges] = useState(0);
-
   const {
     data: userData,
     isLoading,
@@ -23,11 +22,9 @@ const UserProfile = () => {
     email: userData?.data?.email || "",
     mobile: userData?.data?.mobile || "",
     profilePic: userData?.data?.profilePic,
+    id:userData?.data?._id,
+    isgoogle:userData?.data?.is_google
   };
-
-  // const handleProfileBodyChange = () => {
-  //   setProfileBodyChanges(prevChanges => prevChanges + 1);
-  // };
 
   return (
     <>
