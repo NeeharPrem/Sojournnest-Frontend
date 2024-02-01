@@ -1,11 +1,11 @@
 const adminEndpoints = {
-  login: "/admin/login",
-  logout: "/admin/logout",
-  allUsers: "/admin/users",
-  blockUser: "/admin/blockUser",
-  allListings: "/admin/listings",
-  approveListing: "/admin/approveListing",
-  blockListing: "/admin/blockListing",
+  login: "/auth/admin/login",
+  logout: "/auth/admin/logout",
+  allUsers: "/admins/users",
+  blockUser: "/admins/users",
+  allListings: "/admins/listings",
+  approveListing: "/admins/listings",
+  blockListing: "/admins/listings",
 };
 
 export default adminEndpoints;

@@ -16,18 +16,18 @@ export const login = async (admin: Object) => {
   }
 };
 
-// export const logout= async(admin:Object)=>{
-//     try {
-//         const response= await Api.post(adminEndpoints.logout)
-//         return response
-//     } catch (error) {
-//         if(error && (error as AxiosError).isAxiosError){
-//         console.log(error)
-//     }else{
-//         toast.error("Something went wrong")
-//     }
-// }
-// }
+export const logout= async()=>{
+    try {
+        const response= await Api.post(adminEndpoints.logout)
+        return response
+    } catch (error) {
+        if(error && (error as AxiosError).isAxiosError){
+        console.log(error)
+    }else{
+        toast.error("Something went wrong")
+    }
+}
+}
 
 export const allUsers = async (admin: Object) => {
   try {
@@ -83,7 +83,7 @@ export const approveListing = async (id: string) => {
 
 export const blockListing = async (id: string) => {
   try {
-    const response = await Api.post(`${adminEndpoints.blockListing}/${id}`);
+    const response = await Api.patch(`${adminEndpoints.blockListing}/${id}`);
     return response;
   } catch (error) {
     if (error && (error as AxiosError).isAxiosError) {

@@ -1,15 +1,15 @@
 const userEndpoints = {
-  signup: "/user/signup",
-  signupVerification: "/user/signupVerification",
-  login: "/user/login",
-  logout: "/user/logout",
-  profile: "/user/profile",
-  updateProfile: "/user/updateProfile",
-  addRoom: "/user/addRoom",
-  getListings: "/user/getListings",
-  unlist: "/user/unlist",
-  roomData:"/user/roomData",
-  roomDataUpdate:"/user/roomDataUpdate",
+  signup: "/users",
+  signupVerification: "/users/verify-otp",
+  login: "/auth/users/login",
+  logout: "/auth/users/logout",
+  profile: "/users",
+  updateProfile: "/users",
+  getListings: "/users/host/listings",
+  addRoom: "/users/host/listings",
+  roomData:"/users/host/listings",
+  unlist: "/users/host/listings",
+  roomDataUpdate:"/users/host/listings",
   homeListings:"/user/homeListings"
 };
 
