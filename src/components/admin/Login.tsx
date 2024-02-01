@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "../../api/adminapi";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch} from "react-redux";
 import { adminLogin } from "../../store/slice/authSlice";
 import { toast } from "react-toastify";
 interface FormData {
@@ -31,7 +31,7 @@ const Login: React.FC = () => {
     onSuccess: (response) => {
       if (response) {
         toast.success(response.data.message);
-        navigate("/");
+        navigate("/admin/dashboard");
         const data = {
           id: response.data.data._id,
         };

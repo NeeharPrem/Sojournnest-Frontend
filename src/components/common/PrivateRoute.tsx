@@ -1,12 +1,16 @@
-import { useSelector } from "react-redux";
-import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { useSelector } from 'react-redux';
+import { Navigate} from 'react-router-dom';
+import { RootState } from '../../store/store';
 
-interface PrivateRouteProps {
-  children: ReactNode;
+interface AdminPrivateProps {
+  children: React.ReactNode;
 }
 
-export const AdminPrivate: React.FC<PrivateRouteProps> = ({ children }) => {
-  const { adminLoggedin } = useSelector((state: any) => state.auth);
-  return adminLoggedin ? children : <Navigate to="/admin" replace />;
+export const AdminPrivate: React.FC<AdminPrivateProps> = ({ children }) => {
+  const adminId = useSelector((state: RootState) => state.auth.adminLoggedin);
+  if (!adminId) {
+    return <Navigate to="/admin/login"/>;
+  }
+
+  return <>{children}</>;
 };
