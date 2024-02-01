@@ -10,8 +10,10 @@ const HostHome = () => {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["userData"],
+    queryKey: ["hostData"],
     queryFn: getListings,
+    refetchOnMount:true,
+    refetchOnWindowFocus:true,
   });
   return (
     <>
