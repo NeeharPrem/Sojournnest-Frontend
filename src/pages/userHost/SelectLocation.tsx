@@ -8,8 +8,6 @@ const SelectLocation = () => {
   const { roomId } = useParams()
   const isEditRoom = location.pathname.includes('editRoom');
 
-  console.log(roomId)
-
   return (
     <>
       <Navbar />
