@@ -38,7 +38,6 @@ const SignUp = () => {
     if (userLoggin) {
       navigate("/");
     }
-    console.log("isLogin changed:", isLogin);
   }, [userLoggin, isLogin]);
 
   const { mutate: userSignupMutate } = useMutation({
@@ -56,14 +55,15 @@ const SignUp = () => {
   const { mutate: userLoginMutate } = useMutation({
     mutationFn: login,
     onSuccess: (response) => {
-      if (response) {
-        navigate("/");
+      if (response?.status == 200) {
+        toast.success("Login Successfull");
         const data = {
-          id: response.data.message._id,
-          fname: response.data.message.fname,
-          lname: response.data.message.lname,
+          id: response.data?.message?._id,
+          fname: response.data?.message?.fname,
+          lname: response.data?.message?.lname,
         };
         dispatch(setLogin(data));
+        navigate("/");
       }
     },
   });
@@ -100,13 +100,13 @@ const SignUp = () => {
     const result = await login(data);
     if (result?.status == 200) {
       toast.success("Login Successfull");
-      navigate("/");
       const data = {
-        id: result.data._id,
-        fname: result.data.fname,
-        lname: result.data.lname,
+        id: result.data.message._id,
+        fname: result.data.message.fname,
+        lname: result.data.message.lname,
       };
       dispatch(setLogin(data));
+      navigate("/");
     } else {
       console.log("Error");
     }
