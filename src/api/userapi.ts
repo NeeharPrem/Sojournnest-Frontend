@@ -22,6 +22,21 @@ export const signup = async (user: Object) => {
   }
 };
 
+export const resendVerification = async () => {
+  try {
+    const response = await Api.post(userEndpoints.resendVerification);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
 export const signupVerification = async (user: Object) => {
   try {
     const response = await Api.post(userEndpoints.signupVerification, user);

@@ -1,6 +1,7 @@
 const userEndpoints = {
   signup: "/users",
   signupVerification: "/users/verify-otp",
+  resendVerification:"/users/resend-otp",
   login: "/auth/users/login",
   logout: "/auth/users/logout",
   profile: "/users",
@@ -10,7 +11,7 @@ const userEndpoints = {
   roomData:"/users/host/listings",
   unlist: "/users/host/listings",
   roomDataUpdate:"/users/host/listings",
-  homeListings:"/user/homeListings"
+  homeListings:"/users/listings"
 };
 
 export default userEndpoints;
