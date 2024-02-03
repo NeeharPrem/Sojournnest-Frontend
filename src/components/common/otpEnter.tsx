@@ -1,5 +1,5 @@
-import React, { useState, ChangeEvent, useRef, KeyboardEvent } from "react";
-import { signupVerification } from "../../api/userapi";
+import React, { useState, ChangeEvent, useRef, KeyboardEvent, useEffect } from "react";
+import { signupVerification, resendVerification } from "../../api/userapi";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
@@ -15,6 +15,20 @@ const OTPScreen: React.FC<OTPScreenProps> = ({
   setIscomplete,
 }) => {
   const [otp, setOTP] = useState<string>("");
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [showResend, setShowResend] = useState(false);
+
+  useEffect(() => {
+    if (!timeLeft) {
+      setShowResend(true);
+      return;
+    }
+    const intervalId = setInterval(() => {
+      setTimeLeft(timeLeft - 1);
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, [timeLeft]);
+
   const inputRefs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
@@ -24,33 +38,44 @@ const OTPScreen: React.FC<OTPScreenProps> = ({
 
   const handleChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.currentTarget;
-
     if (/^\d*$/.test(value)) {
       setOTP((prevOTP) => {
         const newOTP = prevOTP.split("");
         newOTP[index] = value;
-        const updatedOTP = newOTP.join("");
-        if (index < inputRefs.length - 1 && value !== "") {
-          inputRefs[index + 1].current?.focus();
-        }
-
-        return updatedOTP;
+        return newOTP.join("");
       });
+
+      if (value && index < inputRefs.length - 1) {
+        inputRefs[index + 1].current?.focus();
+      }
     }
   };
 
   const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && index > 0) {
+    if (e.key === "Backspace" && otp[index] === '' && index > 0) {
       inputRefs[index - 1].current?.focus();
     }
   };
 
   const handleVerifyOtp = () => {
-    const formData = {
-      otp: otp,
-    };
+    const formData = { otp };
     otpMutation(formData);
   };
+
+  const resendOtp = () => {
+    resend();
+    setTimeLeft(30);
+    setShowResend(false);
+  };
+
+  const { mutate: resend } = useMutation({
+    mutationFn: resendVerification,
+    onSuccess: (response) => {
+      if (response) {
+        toast.success("OTP resent successfully.");
+      }
+    },
+  });
 
   const { mutate: otpMutation } = useMutation({
     mutationFn: signupVerification,
@@ -79,15 +104,30 @@ const OTPScreen: React.FC<OTPScreenProps> = ({
               onChange={(e) => handleChange(index, e)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               ref={inputRef}
+              disabled={showResend}
             />
           ))}
         </div>
-        <button
-          className="bg-black text-white px-4 py-2 mt-4 rounded-md flex justify-center items-center mx-auto"
-          onClick={handleVerifyOtp}
-        >
-          Verify OTP
-        </button>
+        <div className="flex justify-evenly items-center mt-4">
+          {!showResend && (
+            <button
+              className="bg-black text-white px-4 py-2 rounded-md"
+              onClick={handleVerifyOtp}
+            >
+              Verify OTP
+            </button>
+          )}
+          {timeLeft > 0 ? (
+            <p>Resend OTP in {timeLeft} sec</p>
+          ) : (
+            <button
+              className="bg-black text-white px-4 py-2 rounded-md"
+              onClick={resendOtp}
+            >
+              Resend OTP
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
