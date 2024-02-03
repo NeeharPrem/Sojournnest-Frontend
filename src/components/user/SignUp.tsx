@@ -114,6 +114,40 @@ const SignUp = () => {
 
   const handleSignupClick = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const namePattern = /^[A-Za-zÀ-ÖØ-öø-ÿ]+([ '-.][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
+    if (!namePattern.test(fname) || fname.trim().length === 0) {
+      toast.error("Please enter a valid first name.");
+      return;
+    }
+    if (!namePattern.test(lname) || lname.trim().length === 0) {
+      toast.error("Please enter a valid last name.");
+      return;
+    }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters long.");
+      return;
+    }
+    if (!/\d/.test(password)) {
+      toast.error("Password must contain at least one number.");
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      toast.error("Password must contain at least one uppercase letter.");
+      return;
+    }
+    if (!/[a-z]/.test(password)) {
+      toast.error("Password must contain at least one lowercase letter.");
+      return;
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      toast.error("Password must contain at least one special character.");
+      return;
+    }
     const formData = { email, password, fname, lname };
     userSignupMutate(formData);
   };
@@ -138,7 +172,7 @@ const SignUp = () => {
             <h2 className="text-2xl font-bold mb-4">
               {isLogin ? "Login" : "Sign Up"}
             </h2>
-            <form onSubmit={isLogin ? handleSubmit : handleSignupClick}>
+              <form onSubmit={isLogin ? handleSubmit : handleSignupClick} noValidate>
               {!isLogin && (
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-600">
@@ -172,7 +206,7 @@ const SignUp = () => {
                   Email:
                 </label>
                 <input
-                  type="email"
+                  type="text"
                   className="w-full border px-3 py-2 rounded-md"
                   placeholder="Enter your email"
                   value={email}
