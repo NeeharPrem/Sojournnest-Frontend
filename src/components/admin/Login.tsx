@@ -42,7 +42,6 @@ const Login: React.FC = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Submitted Form Data:", formData);
     userLoginMutate(formData);
   };
 
