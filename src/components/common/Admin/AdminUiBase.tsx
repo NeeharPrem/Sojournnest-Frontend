@@ -17,8 +17,13 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import AdminSidebar from '../../admin/AdminSidebar';
-
-
+import { useMutation } from '@tanstack/react-query';
+import { logout } from '../../../api/adminapi';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { adminLogout } from '../../../store/slice/authSlice';
+import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 
 const drawerWidth: number = 240;
 
@@ -77,6 +82,23 @@ export default function AdminUiBase({ children }: { children: ReactNode }) {
     const toggleDrawer = () => {
         setOpen(!open);
     };
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { mutate: adminout } = useMutation({
+        mutationFn: logout,
+        onSuccess: (response) => {
+            if (response) {
+                dispatch(adminLogout());
+                toast.success("Logout Success");
+                navigate("/admin/login");
+            }
+        },
+    });
+
+    const handleLogout =()=> {
+        adminout()
+    };
 
     return (
         <ThemeProvider theme={defaultTheme}>
@@ -109,11 +131,12 @@ export default function AdminUiBase({ children }: { children: ReactNode }) {
                         >
                             Dashboard
                         </Typography>
-                        <IconButton color="inherit">
+                        {/* <IconButton color="inherit" >
                             <Badge badgeContent={4} color="secondary">
                                 <NotificationsIcon />
                             </Badge>
-                        </IconButton>
+                        </IconButton> */}
+                        <PowerSettingsNewIcon onClick={handleLogout} />
                     </Toolbar>
                 </AppBar>
                 <Drawer variant="permanent" open={open}>
@@ -147,7 +170,7 @@ export default function AdminUiBase({ children }: { children: ReactNode }) {
                     }}
                 >
                     <Toolbar />
-                    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                    <Container className='justify-center' maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
                         {/* <Grid container spacing={3}>
                             
                         </Grid> */}
