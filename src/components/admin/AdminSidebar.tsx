@@ -6,6 +6,7 @@ import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ChecklistOutlinedIcon from '@mui/icons-material/ChecklistOutlined';
 import PeopleIcon from '@mui/icons-material/People';
+import CategoryIcon from '@mui/icons-material/Category';
 
 interface MenuItem {
   text: string;
@@ -17,6 +18,7 @@ const menuItems: MenuItem[] = [
   { text: "Dashboard", icon: <DashboardIcon />, link: "/admin/dashboard" },
   { text: "Listings", icon: <ChecklistOutlinedIcon />, link: "/admin/listings" },
   { text: "Users", icon: <PeopleIcon />, link: "/admin/users" },
+  { text: "Amenities/Category", icon: <CategoryIcon />, link: "/admin/facilities" },
 ];
 
 const AdminSidebar = () => {

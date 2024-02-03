@@ -93,3 +93,95 @@ export const blockListing = async (id: string) => {
     }
   }
 };
+
+export const addAmenity = async (data:object) => {
+  try {
+    const response = await Api.post(adminEndpoints.addAmenity,data);
+    console.log(response)
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const getAmenity = async () => {
+  try {
+    const response = await Api.get(adminEndpoints.getAmenity);
+    return response?.data?.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const addCategory = async (data: object) => {
+  try {
+    const response = await Api.post(adminEndpoints.addCategory,data);
+    console.log(response)
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const getCategory = async () => {
+  try {
+    const response = await Api.get(adminEndpoints.getCategory);
+    return response?.data?.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const deleteAmenity = async (data:object) => {
+  try {
+    const response = await Api.patch(adminEndpoints.deleteAmenity,data);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const deleteCategory = async (data:object) => {
+  try {
+    const response = await Api.patch(adminEndpoints.deleteCategory,data);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};

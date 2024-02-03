@@ -6,6 +6,12 @@ const adminEndpoints = {
   allListings: "/admins/listings",
   approveListing: "/admins/listings",
   blockListing: "/admins/listings",
+  addAmenity:"/admins/amenities",
+  getAmenity:"/admins/amenities",
+  addCategory:"/admins/category",
+  getCategory: "/admins/category",
+  deleteAmenity:"/admins/amenities",
+  deleteCategory:"/admins/category"
 };
 
 export default adminEndpoints;
