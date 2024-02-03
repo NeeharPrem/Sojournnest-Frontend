@@ -1,54 +1,38 @@
+import { useQuery } from "@tanstack/react-query";
+import { allListings } from "../../api/userapi";
+import Skeleton from "./HomeSkeleton";
 
-const hotels = [
-  { id: 1, name: "Hotel A", image: "https://placekitten.com/300/200" },
-  { id: 2, name: "Hotel B", image: "https://placekitten.com/301/200" },
-  { id: 3, name: "Hotel C", image: "https://placekitten.com/302/200" },
-  { id: 4, name: "Hotel A", image: "https://placekitten.com/300/200" },
-];
+interface Room {
+  name: string;
+  _id: string;
+  images: string[];
+  state:string
+}
 
 const HomePage = () => {
+  const { data: Data } = useQuery({
+    queryKey: ["roomData"],
+    queryFn: allListings,
+  });
+
   return (
-    <div className="bg-gray-100 min-h-screen">
-      {/* <header className="bg-blue-500 p-4 text-white text-center">
-        <h1 className="text-4xl font-bold">Sojourn Nest</h1>
-      </header> */}
-
+    <div className="bg-white min-h-screen">
       <main className="container mx-auto py-8 flex flex-col items-center">
-        {/* <h2 className="text-2xl font-semibold mb-4">Featured Hotels</h2> */}
-
-        <div className="flex flex-wrap justify-center gap-6">
-          {hotels.map((hotel) => (
-            <div key={hotel.id} className="bg-white p-4 rounded shadow-md w-70">
-              <img
-                src={hotel.image}
-                alt={hotel.name}
-                className="w-full h-40 object-cover mb-4 rounded"
-              />
-              <h3 className="text-lg font-semibold">{hotel.name}</h3>
-              <button className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
-                Book Now
-              </button>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex flex-wrap justify-center gap-6 mt-8">
-          {hotels.map((hotel) => (
-            <div key={hotel.id} className="bg-white p-4 rounded shadow-md w-70">
-              <img
-                src={hotel.image}
-                alt={hotel.name}
-                className="w-full h-40 object-cover mb-4 rounded"
-              />
-              <h3 className="text-lg font-semibold">{hotel.name}</h3>
-              <button className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
-                Book Now
-              </button>
+        <div className="flex justify-center flex-wrap gap-3">
+          {Data?.data?.map((room: Room) => (
+            <div key={room._id} className="w-full sm:w-64 md:w-72 lg:w-96 bg-white rounded-lg overflow-hidden shadow-md border border-gray-300 p-4">
+              <img src={room.images[0]} alt="Card" className="w-full h-48 object-cover" />
+              <div className="p-4">
+                <h2 className="text-xl font-bold mb-2">{room.name || <Skeleton />}</h2>
+                <p className="text-gray-700">{room?.state}</p>
+                {/* <div className="mt-4">
+                  <a href="#" className="text-blue-500 hover:underline">Read More</a>
+                </div> */}
+              </div>
             </div>
           ))}
         </div>
       </main>
-
       <footer className="bg-blue-500 p-4 text-white text-center">
         <p>&copy; 2023 Hotel Booking. All rights reserved.</p>
       </footer>
