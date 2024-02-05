@@ -39,7 +39,7 @@ const Header = () => {
     ...(userLoggedin
       ? [
           ...(location.pathname !== "/host"
-            ? [{ name: "Switch to Host", link: "/host" }]
+            ? [{ name: "Switch to Host", link: "/Dashboard" }]
             : []),
           ...(location.pathname === "/host"
             ? [{ name: "Switch to User", link: "/" }]
@@ -53,7 +53,7 @@ const Header = () => {
   ];
 
   return (
-    <div className="shadow-md w-full fixed top-0 left-0">
+    <div className="shadow-md w-full top-0 left-0">
       <div className="md:flex items-center justify-between bg-white py-4 md:px-10 px-7">
         {/* logo section */}
         <div className="font-bold text-2xl cursor-pointer flex items-center gap-1">
