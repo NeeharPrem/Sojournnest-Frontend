@@ -62,7 +62,7 @@ const SignUp = () => {
           fname: response.data?.message?.fname,
           lname: response.data?.message?.lname,
         };
-        dispatch(setLogin(data));
+        dispatch(setLogin({ userId: data.id,userLoggedin:data}));
         navigate("/");
       }
     },
@@ -105,7 +105,7 @@ const SignUp = () => {
         fname: result.data.message.fname,
         lname: result.data.message.lname,
       };
-      dispatch(setLogin(data));
+      dispatch(setLogin({ userId: data.id, userLoggedin: data }));
       navigate("/");
     } else {
       console.log("Error");
