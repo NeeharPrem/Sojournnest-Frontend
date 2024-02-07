@@ -87,6 +87,17 @@ export const userProfile = async () => {
   }
 };
 
+export const getUser = async (id:string) => {
+  try {
+   
+    const response = await Api.get(`${userEndpoints.getUser}/${id}`);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export const updateProfile = async ({ id, userData }: UpdateProfileArgs): Promise<AxiosResponse<any, any>>  => {
   try {
     const response = await Api.patch(`${userEndpoints.updateProfile}/${id}`, userData);
@@ -173,3 +184,56 @@ export const allListings = async (user:Object) => {
   }
 };
 
+export const usergetChat = async (id: string | FormData | undefined) => {
+  try {
+    const response = await Api.get(`${userEndpoints.usergetChat}/${id}`);
+    return response;
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+    return null;
+  }
+};
+
+export const hostgetChat = async (id: string | undefined) => {
+  try {
+    const response = await Api.get(`${userEndpoints.hostgetChat}/${id}`);
+    return response;
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+    return null;
+  }
+};
+
+export const addMessage = async (Data: Object) => {
+  try {
+    const response = await Api.post(userEndpoints.addMessage,Data);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+
+export const getMessage = async (id: string | undefined) => {
+  try {
+    const response = await Api.get(`${userEndpoints.getMessage}/${id}`);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
