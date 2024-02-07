@@ -58,7 +58,15 @@ const ProfileBody: React.FC<ProfileBody> = ({
     setIsPassEditing(false);
   };
 
+  const validateName = (name: string) => {
+    return /^[A-Za-z]+[A-Za-z\s]*$/.test(name.trim());
+  };
+
   const handleNameSaveClick = () => {
+    if (!validateName(firstName) || !validateName(lastName)) {
+      toast.error("Invalid name format");
+      return;
+    }
     if (!firstName || !lastName || !userInfo || !userInfo.id) {
       toast.error("First and Last Name cannot be empty");
       return;

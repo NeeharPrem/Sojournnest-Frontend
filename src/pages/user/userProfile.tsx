@@ -5,6 +5,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { userProfile } from "../../api/userapi";
 
+interface UserProfile {
+  id: string;
+  fname: string;
+  lname: string,
+  profiePic:string,
+  isgoogle:boolean
+}
+
 const UserProfile = () => {
   const [profileBodyChanges] = useState(0);
   const {
