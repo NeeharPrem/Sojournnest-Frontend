@@ -2,6 +2,7 @@ import userEndpoints from "../services/endpoints/userEndpoints";
 import { toast } from "react-toastify";
 import { AxiosError, AxiosResponse } from "axios";
 import Api from "../services/api";
+import { QueryFunctionContext } from "@tanstack/react-query";
 
 interface UpdateProfileArgs {
   id: string;
@@ -133,12 +134,30 @@ export const addRoom = async (roomData: FormData) => {
   }
 };
 
-export const roomData = async (id: string | FormData | undefined) => {
+export const roomData = async (id: string| undefined) => {
   try {
     const response = await Api.get(`${userEndpoints.roomData}/${id}`);
-    return response;
+    return response?.data;
   } catch (error) {
     if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+    return null;
+  }
+};
+
+
+export const roomDetail = async ({ queryKey }: QueryFunctionContext<[string, string | null]>) => {
+  const [_, roomId] = queryKey;
+  try {
+    console.log(roomId)
+    const response = await Api.get(`${userEndpoints.roomDetail}/${roomId}`);
+    console.log(response)
+    return response?.data?.data;
+  } catch (error) {
+    if ((error as AxiosError).isAxiosError) {
       console.log(error);
     } else {
       toast.error("Something went wrong");

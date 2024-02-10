@@ -7,6 +7,7 @@ const userEndpoints = {
   profile: "/users",
   getUser:'/users',
   updateProfile: "/users",
+  roomDetail:'/users/listings',
   usergetChat:'/chat',
   getListings: "/users/host/listings",
   addRoom: "/users/host/listings",
