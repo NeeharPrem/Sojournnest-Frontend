@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 interface AuthState {
   userLoggedin: boolean | null;
   adminLoggedin: boolean | null;
+  userId: string | null;
 }
 
 const storedUserinfo = localStorage.getItem("userLoggedin");
@@ -11,9 +12,12 @@ const parsedUserinfo = storedUserinfo ? JSON.parse(storedUserinfo) : null;
 const storedAdmininfo = localStorage.getItem("adminLoggedin");
 const parsedAdmininfo = storedAdmininfo ? JSON.parse(storedAdmininfo) : null;
 
+const storedUserId = localStorage.getItem("userId");
+
 const initialState: AuthState = {
   userLoggedin: parsedUserinfo ?? null,
   adminLoggedin: parsedAdmininfo ?? null,
+  userId: storedUserId
 };
 
 const authSlice = createSlice({
@@ -21,7 +25,9 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setLogin: (state, action) => {
-      state.userLoggedin = action.payload;
+      const { userLoggedin, userId } = action.payload;
+      state.userLoggedin = userLoggedin;
+      localStorage.setItem("userId", userId)
       localStorage.setItem("userLoggedin", JSON.stringify(action.payload));
     },
     userLogout: (state) => {
