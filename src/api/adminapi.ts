@@ -96,7 +96,27 @@ export const blockListing = async (id: string) => {
 
 export const addAmenity = async (data:object) => {
   try {
-    const response = await Api.post(adminEndpoints.addAmenity,data);
+    const response = await Api.put(adminEndpoints.addAmenity,data);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+interface EditAmenityData {
+  id: string;
+  value:string;
+  index:number
+}
+export const editAmenity = async (data: EditAmenityData) => {
+  try {
+    const response = await Api.post(adminEndpoints.editAmenity,data);
     console.log(response)
     return response;
   } catch (error: any) {
@@ -127,8 +147,23 @@ export const getAmenity = async () => {
 
 export const addCategory = async (data: object) => {
   try {
-    const response = await Api.post(adminEndpoints.addCategory,data);
+    const response = await Api.put(adminEndpoints.addCategory,data);
     console.log(response)
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const editCategory = async (data: EditAmenityData) => {
+  try {
+    const response = await Api.post(adminEndpoints.editCategory, data);
     return response;
   } catch (error: any) {
     if (error.response) {
