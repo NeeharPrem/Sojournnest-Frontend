@@ -7,19 +7,40 @@ export interface User {
     profilePic: string;
 }
 
+interface Message {
+    conversationId: string;
+    text: string;
+    // Add other properties like sender, timestamp etc. as needed
+}
+
 interface ConversationListProps {
     usersWithConvoId: {
-        user: User; // Adjusted to match the User interface
+        user: User;
         conversationId: string;
     }[];
     onConversationSelect: (userId: string, conversationId: string) => void;
+    lastMsg: Message[][];
 }
 
-const ConversationList: React.FC<ConversationListProps> = ({ usersWithConvoId, onConversationSelect }) => {
+const ConversationList: React.FC<ConversationListProps> = ({ usersWithConvoId, onConversationSelect, lastMsg }) => {
     const handleConversationClick = (userId: string, conversationId: string) => {
         console.log(`Conversation with user ${userId} clicked.`);
-        onConversationSelect(userId,conversationId);
+        onConversationSelect(userId, conversationId);
     };
+
+
+    const findLastMessage = (conversationId: string): string => {
+        if (!lastMsg || lastMsg.length === 0) {
+            return "No messages yet";
+        }
+        const conversationMessages = lastMsg.find(messages => messages?.some(message => message.conversationId === conversationId));
+        if (conversationMessages && conversationMessages.length > 0) {
+            const lastMessage = conversationMessages[conversationMessages.length - 1];
+            return lastMessage.text;
+        }
+        return "No messages yet";
+    };
+
 
     return (
         <div className="flex flex-col h-screen bg-gray-100">
@@ -40,7 +61,7 @@ const ConversationList: React.FC<ConversationListProps> = ({ usersWithConvoId, o
                             />
                             <div>
                                 <h2 className="text-lg font-semibold">{user.fname} {user.lname}</h2>
-                                <p className="text-gray-600">Hey, how are you doing?</p>
+                                <p className="text-gray-600">{findLastMessage(conversationId)}</p>
                             </div>
                         </button>
                     </li>

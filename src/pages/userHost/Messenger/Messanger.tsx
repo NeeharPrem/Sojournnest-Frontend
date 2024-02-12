@@ -8,28 +8,17 @@ import { RootState } from '../../../store/store';
 import { hostgetChat, getUser } from "../../../api/userapi";
 import { getMessage } from "../../../api/userapi";
 import socket from "../../../services/socket";
-
-interface UserWithConvoId {
-    user: any;
-    conversationId: string;
-}
-
-interface Messagee {
-    conversationId?: string;
-    createdAt?: Date | Number;
-    sender: string;
-    text: string;
-    image?: string
-    updatedAt?: string;
-    __v?: number;
-    _id?: string;
-}
+import ErrorBoundary from "../../../components/ErrorBoundry/Error";
 
 export const Messanger = () => {
     const [conversations, setConversations] = useState<any[]>([]);
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
     const [conversationIdSelected, setConversationIdSelected] = useState<string | null>(null);
-    const [arrivalMessage, setArrivalMessage] = useState<Messagee | null>(null);
+    const [selectedUserDetails, setSelectedUserDetails] = useState<{
+        fname?: string;
+        lname?: string;
+        image?: string;
+    }>({});
    
     const userId = useSelector((state: RootState) => state.auth.userId);
 
@@ -74,6 +63,19 @@ export const Messanger = () => {
         })),
     });
 
+    const messageQueries = useQueries({
+        queries: membersWithConvoId.map(({ conversationId }) => ({
+            queryKey: ['messages', conversationId],
+            queryFn: () => getMessage(conversationId),
+            enabled: !!conversationId,
+            meta: { conversationId },
+        })),
+    });
+
+    const lastmsg=messageQueries.map((items)=>(
+        items.data?.data
+    ))
+
     const usersWithConvoId = membersWithConvoId.map((member, index) => {
         const queryResult = userQueries[index];
         return {
@@ -85,6 +87,14 @@ export const Messanger = () => {
     const handleConversationSelect = (userId: string, conversationId: string) => {
         setSelectedUserId(userId);
         setConversationIdSelected(conversationId);
+        const selectedUser = usersWithConvoId.find(userWithConvo => userWithConvo.user._id === userId)?.user;
+        if (selectedUser) {
+            setSelectedUserDetails({
+                fname: selectedUser.fname,
+                lname: selectedUser.lname,
+                image: selectedUser.profilePic,
+            });
+        }
     };
 
     const { data: messageData,refetch} = useQuery({
@@ -94,19 +104,36 @@ export const Messanger = () => {
     });
     const message= messageData?.data
     
-    
     return (
         <div className="">
             <Header />
-            <div className="flex flex-row ps-4 pe-4">
+            <div className="flex lg:px-16 px-5 sm:px-10 md:px-10 pt-20">
                 <div className="flex bg-blue-gray-300 w-80 h-screen border-r-4">
-                    <ConversationList
-                        usersWithConvoId={usersWithConvoId}
-                        onConversationSelect={handleConversationSelect}
-                    />
+                    <ErrorBoundary>
+                        <ConversationList
+                            lastMsg={lastmsg}
+                            usersWithConvoId={usersWithConvoId}
+                            onConversationSelect={handleConversationSelect}
+                        />
+                    </ErrorBoundary>
                 </div>
                 <div className="lg:w-full">
-                    <ChatComponent refetch={refetch} messages={message} rcv={selectedUserId || undefined} Me={userId || undefined} convId={conversationIdSelected}/>
+                    {conversationIdSelected ? (
+                        <ChatComponent
+                            refetch={refetch}
+                            messages={message}
+                            rcv={selectedUserId || undefined}
+                            Me={userId || undefined}
+                            convId={conversationIdSelected}
+                            fname={selectedUserDetails.fname}
+                            lname={selectedUserDetails.lname}
+                            image={selectedUserDetails.image}
+                        />
+                    ) : (
+                        <div className="flex items-center justify-center h-screen">
+                            <p>No chats selected</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
