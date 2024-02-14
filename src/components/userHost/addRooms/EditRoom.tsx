@@ -14,14 +14,15 @@ interface Location {
 
 interface Room {
     _id: string;
+    id:string
 }
 
-interface DropdownProps {
-    options: string[];
-    onSelect: (selectedValue: string) => void;
-    label: string;
-    value: string;
-}
+// interface DropdownProps {
+//     options: string[];
+//     onSelect: (selectedValue: string) => void;
+//     label: string;
+//     value: string;
+// }
 
 interface editProps {
     Id: string | undefined
@@ -47,6 +48,7 @@ const EditRoom = ({ Id }: editProps) => {
     const navigate=useNavigate()
     const [room, setRoom] = useState<Room | object>({})
     const [roomImages, setRoomImages] = useState<File[]>([]);
+    const [addImages, setAddImages]=useState<File[]>([])
     const [formData, setFormData] = useState<MyFormData>({
         name: '',
         bathrooms: '',
@@ -69,7 +71,6 @@ const EditRoom = ({ Id }: editProps) => {
         const fetchData = async () => {
             const res = await roomData(Id)
             const Data = res?.data
-            console.log(Data)
             setRoom(Data.data)
             if (Data) {
                 setFormData({
@@ -141,17 +142,23 @@ const EditRoom = ({ Id }: editProps) => {
         setShowMap(!showMap);
     }
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>): void => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
-            setRoomImages([...roomImages, ...filesArray]);
+            setAddImages([...addImages,...filesArray]);
         }
     };
 
-    const handleRemoveImage = (index: number) => {
+    const handleOldImage = (index: number) => {
         const updatedImages = [...roomImages];
         updatedImages.splice(index, 1);
         setRoomImages(updatedImages);
+    };
+
+    const handleNewImage = (index: number) => {
+        const updatedImages = [...addImages];
+        updatedImages.splice(index, 1);
+        setAddImages(updatedImages);
     };
 
     const handleAmenitySelect = (selectedValue: string) => {
@@ -170,10 +177,10 @@ const EditRoom = ({ Id }: editProps) => {
             setAmenities(newAmenities);
         }
     };
-   
+   console.log(addImages)
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
+    
     //     //FormData
         const form = new FormData();
         form.append('name',formData.name)
@@ -189,14 +196,19 @@ const EditRoom = ({ Id }: editProps) => {
         form.append('state', selectedState)
         form.append('district', selectedDistrict)
         form.append('category', seletctedCategory)
-        // roomImages.forEach((image, index) => {
+        // form.append('images',addImages)
+        // addImages.forEach((file) => {
+        //     // Using the same name with brackets (like 'images[]') can help the server recognize it as an array
+        //     form.append(`images[]`, file, file.name);
+        // });
+        // addImages.forEach((image, index) => {
         //     form.append(`image${index}`, image);
         // });
-        roomImages.forEach((image, index) => {
-            if (image instanceof File) {
-                form.append(`image${index}`, image);
-            }
-        });
+        // addImages.forEach((image, index) => {
+        //     if (image instanceof File) {
+        //         form.append(`image${index}`, image);
+        //     }
+        // });
 
     //     // Form validation
         const name = form.get('name') as string;
@@ -372,7 +384,7 @@ const EditRoom = ({ Id }: editProps) => {
         for (let [key, value] of form.entries()) {
             console.log(key, value);
         }
-        const res = await roomDataUpdate(Id,form)
+        const res = await roomDataUpdate(roomId,form)
         console.log(res)
         const data = res?.data
         if (data.status==200) {
@@ -553,40 +565,69 @@ const EditRoom = ({ Id }: editProps) => {
                             ></textarea>
                         </div>
                         <div className="items-center">
-                            <label htmlFor="image" className="block text-gray-800 w-30">
-                                Room Images (upto 5 images)
-                            </label>
-                            <input
-                                type="file"
-                                id="images"
-                                name="images"
-                                className="w-3/4 border border-gray-300 p-2 rounded-lg"
-                                multiple
-                                onChange={handleImageUpload}
-                            />
+                            {(5 - (roomImages.length + addImages.length)) > 0 && (
+                                <>
+                                    <label className="block text-gray-800 w-3/4">
+                                        Room Images (up to {5 - (roomImages.length + addImages.length)} images)
+                                        <input
+                                            type="file"
+                                            id="images"
+                                            name="images"
+                                            className="w-3/4 border border-gray-300 p-2 rounded-lg"
+                                            multiple
+                                            onChange={handleImageUpload}
+                                        />
+                                    </label>
+                                </>
+                            )}
                         </div>
-                        {roomImages.length > 0 && (
-                            <div className="flex items-center space-x-6">
-                                <label className="block text-gray-800 w-1/4">Uploaded Images</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {roomImages.map((image, index) => (
-                                        <div key={index} className="relative">
-                                            <img
-                                                src={(image instanceof Blob || image instanceof File) ? URL.createObjectURL(image) : image}
-                                                alt={`Room Image ${index + 1}`}
-                                                className="w-10 h-10 object-cover rounded-lg"
-                                            />
-                                            <button
-                                                className="absolute top-0 right-0 p-1 bg-red-500 text-white rounded-full"
-                                                onClick={() => handleRemoveImage(index)}
-                                            >
-                                                X
-                                            </button>
-                                        </div>
-                                    ))}
+                        <div className='flex flex-row gap-2'>
+                            <label className="block text-gray-800 w-1/4">Uploaded Images</label>
+                            {roomImages.length > 0 && (
+                                <div className="flex items-center space-x-6">
+                                    <div className="flex">
+                                        {roomImages.map((image, index) => (
+                                            <div key={index} className="relative">
+                                                <img
+                                                    src={(image instanceof Blob || image instanceof File) ? URL.createObjectURL(image) : image}
+                                                    alt={`Room Image ${index + 1}`}
+                                                    className="w-10 h-10 object-cover rounded-lg"
+                                                />
+                                                <button
+                                                type='button'
+                                                    className="absolute top-0 right-0 p-1 bg-red-500 text-white rounded-full"
+                                                    onClick={() => handleOldImage(index)}
+                                                >
+                                                    x
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                            {addImages.length > 0 && (
+                                <div className="flex items-center">
+                                    {/* <label className="block text-gray-800 w-1/4">Additional Images</label> */}
+                                    <div className="flex justify-start">
+                                        {addImages.map((image, index) => (
+                                            <div key={index} className="relative">
+                                                <img
+                                                    src={(image instanceof Blob || image instanceof File) ? URL.createObjectURL(image) : image}
+                                                    alt={`Additional Image ${index + 1}`}
+                                                    className="w-10 h-10 object-cover rounded-lg"
+                                                />
+                                                <button
+                                                    className="absolute top-0 right-0 p-1 bg-red-500 text-white rounded-full"
+                                                    onClick={() => handleNewImage(index)}
+                                                >
+                                                    X
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                         <div className='flex flex-row gap-5'>
                             <div className="items-center">
                                 <label htmlFor="location" className="block text-gray-800 w-1/4">
