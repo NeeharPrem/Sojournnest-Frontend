@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ChatComponent from "../../../components/userHost/Messenger/Messanger";
 import Header from "../../../components/Navbar";
 import ConversationList from "../../../components/userHost/Messenger/Conversations";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery,useMutation} from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { RootState } from '../../../store/store';
-import { hostgetChat, getUser } from "../../../api/userapi";
+import { hostgetChat, getUser, hostNewconversation } from "../../../api/userapi";
 import { getMessage } from "../../../api/userapi";
 import socket from "../../../services/socket";
 import ErrorBoundary from "../../../components/ErrorBoundry/Error";
+import { useLocation } from "react-router-dom";
 
 export const Messanger = () => {
     const [conversations, setConversations] = useState<any[]>([]);
@@ -19,8 +20,20 @@ export const Messanger = () => {
         lname?: string;
         image?: string;
     }>({});
+
+    const { mutate: addNewconv } = useMutation({
+        mutationFn: hostNewconversation,
+        onSuccess: (response) => {
+            if (response) {
+                console.log(response)
+            }
+        },
+    });
    
     const userId = useSelector((state: RootState) => state.auth.userId);
+
+    const location = useLocation();
+    const rcvId = location.state?.userId;
 
     // Fetch conversations
     const { data: chatList, isSuccess } = useQuery({
@@ -33,7 +46,7 @@ export const Messanger = () => {
     useEffect(() => {
         socket.emit("addUser", userId);
         socket.on("getUsers", (users) => {
-            console.log(users, "socket");
+            console.log("socket");
         });
     }, []);
 
@@ -43,6 +56,38 @@ export const Messanger = () => {
             setConversations(chatList.data.conv);
         }
     }, [chatList, isSuccess]);
+
+    // check rcvId
+    useEffect(() => {
+        if (rcvId) {
+            getUser(rcvId).then((response: { data: any; }) => {
+                const userDetails = response.data;
+                setSelectedUserDetails({
+                    fname: userDetails?.fname,
+                    lname: userDetails?.lname,
+                    image: userDetails?.profilePic,
+                });
+                setSelectedUserId(rcvId);
+            });
+
+            // Check if there's already a conversation with the rcvId
+            const existingConversation = conversations.find(conv =>
+                conv.members.includes(rcvId)
+            );
+
+            if (existingConversation) {
+                // If conversation exists, select it
+                setConversationIdSelected(existingConversation._id);
+            } else {
+                const users={
+                    senderId:userId,
+                    receiverId:rcvId
+                }
+                addNewconv(users)
+                console.log("Create and select a new conversation with the user:", rcvId);
+            }
+        }
+    }, [rcvId, conversations, userId]);
 
     let membersWithConvoId = [];
     if (conversations.length > 0) {
@@ -75,6 +120,15 @@ export const Messanger = () => {
     const lastmsg=messageQueries.map((items)=>(
         items.data?.data
     ))
+
+    // refetch
+    const refetchAllMessages = () => {
+        messageQueries.forEach(query => {
+            if (query.refetch) {
+                query.refetch().catch(error => console.error("Refetch error:", error));
+            }
+        });
+    };
 
     const usersWithConvoId = membersWithConvoId.map((member, index) => {
         const queryResult = userQueries[index];
@@ -128,6 +182,7 @@ export const Messanger = () => {
                             fname={selectedUserDetails.fname}
                             lname={selectedUserDetails.lname}
                             image={selectedUserDetails.image}
+                            lstmsg={refetchAllMessages}
                         />
                     ) : (
                         <div className="flex items-center justify-center h-screen">
