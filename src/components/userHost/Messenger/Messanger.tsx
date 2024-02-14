@@ -23,6 +23,7 @@ interface ChatComponentProps {
     fname: string | undefined
     lname: string | undefined
     image: string | undefined
+    lstmsg: () => void;
 }
 
 interface Messagee {
@@ -40,7 +41,7 @@ interface UserStatus {
     online?: boolean;
 }
 
-const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, convId, rcv,fname,lname,image}) => {
+const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, convId, rcv,fname,lname,image,lstmsg}) => {
     const [message, setMessage] = useState<string>('');
     const [arrivalMessage, setArrivalMessage] = useState<Messagee | null>(null);
     const [displayMessages, setDisplayMessages] = useState<ChatMessage[]>([]);
@@ -64,6 +65,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, co
         mutationFn: addMessage,
         onSuccess: () => {
             refetch();
+            lstmsg()
         },
     });
 
@@ -158,7 +160,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, co
             return `Last seen: ${lastSeenDate.toLocaleString()}`;
         }
     };
-
 
     return (
         <div className="flex flex-col bg-gray-100 h-screen">
