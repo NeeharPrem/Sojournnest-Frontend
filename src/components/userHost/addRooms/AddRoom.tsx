@@ -3,10 +3,11 @@ import AddLocation from '../addLocation/AddLocation';
 import { BiReset } from "react-icons/bi";
 import Dropdown from '../../common/DropDown/Dropdown';
 import { toast } from "react-toastify";
-import { useMutation } from '@tanstack/react-query';
-import StateDistrictDropdown from '../../common/DropDown/StateDistrictDropdown';
+import { useMutation,useQuery} from '@tanstack/react-query';
+// import StateDistrictDropdown from '../../common/DropDown/StateDistrictDropdown';
 import { useNavigate } from 'react-router-dom';
 import { addRoom } from '../../../api/userapi';
+import Loader from '../../common/Loader';
 
 interface Location {
   longitude: number;
@@ -19,17 +20,23 @@ const AddRoom: React.FC = () => {
   const [showAmenityField, setShowAmenityField] = useState<boolean>(false);
   const [amenities, setAmenities] = useState<string[]>([]);
   const [roomImages, setRoomImages] = useState<File[]>([]);
-  const [selectedState, setSelectedState] = useState<string>('');
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
+  // const [selectedState, setSelectedState] = useState<string>('');
+  // const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [seletctedCategory, setCategory] = useState<string>('');
 
   const navigate = useNavigate()
 
-  const handleSelectState = (state: string, district: string) => {
-    setSelectedState(state);
-    setSelectedDistrict(district);
-  };
-
+  // const handleSelectState = (state: string, district: string) => {
+  //   setSelectedState(state);
+  //   setSelectedDistrict(district);
+  // };
+  
+  const url =`https://api.geoapify.com/v1/geocode/reverse?lat=${selectedLocation?.latitude}&lon=${selectedLocation?.longitude}&apiKey=bbe9d00c85d542938910401c269a06cd`;
+  const { data: locationData,isLoading} = useQuery({
+    queryKey: ["userData", selectedLocation],
+    queryFn: () => fetch(url).then((response) => response.json()),
+    enabled: !!selectedLocation, 
+  });
 
   const handlePlusClick = () => {
     setShowAmenityField(!showAmenityField);
@@ -84,9 +91,12 @@ const AddRoom: React.FC = () => {
     const formData = new FormData(e.currentTarget);
     formData.append("latitude", selectedLocation?.latitude?.toString() || '')
     formData.append("longitude", selectedLocation?.longitude?.toString() || '')
-    formData.append('amenities', JSON.stringify(amenities));
-    formData.append('state',selectedState)
-    formData.append('district',selectedDistrict)
+    // formData.append('amenities', JSON.stringify(amenities));
+    amenities.forEach((amenity, index) => {
+      formData.append(`amenities[${index}]`, amenity);
+    });
+    formData.append('state', locationData?.features[0].properties?.state)
+    formData.append('district', locationData?.features[0].properties?.state_district)
     formData.append('category',seletctedCategory)
 
     // Form validation
@@ -241,17 +251,14 @@ const AddRoom: React.FC = () => {
       return;
     }
 
-    const amenitiesArray = formData.get('amenities');
-    console.log(amenitiesArray)
-    if (amenitiesArray && typeof amenitiesArray === 'string') {
-      const parsedAmenities = JSON.parse(amenitiesArray);
-      if (Array.isArray(parsedAmenities) && parsedAmenities.length > 0) {
-      } else {
-        toast.error('Please select at least one amenity 1');
-        return;
+    let amenitiesArray = [];
+    for (const key of formData.keys()) {
+      if (key.startsWith('amenities[')) {
+        amenitiesArray.push(formData.get(key));
       }
-    } else {
-      toast.error('Please select at least one amenity 2');
+    }
+    if (amenitiesArray.length === 0) {
+      toast.error('Please select at least one amenity');
       return;
     }
 
@@ -265,20 +272,22 @@ const AddRoom: React.FC = () => {
       toast.error('Select a Location');
       return;
     }
-    console.log(formData)
-  
+
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
     roomData(formData)
    
   };
 
-  const { mutate: roomData } = useMutation({
+  const { mutate: roomData,isPending} = useMutation({
     mutationFn: addRoom,
     onSuccess: (response) => {
       if (response.status==200)
-      console.log(response)
         navigate('/host')
     },
   });
+
 
   return (
     <div className="bg-gray-100 min-h-screen w-full">
@@ -343,7 +352,7 @@ const AddRoom: React.FC = () => {
                 <label htmlFor="guests" className="block text-gray-800 w-30">
                   category
                 </label>
-                <Dropdown options={['Category 1', 'Category 2', 'Category 3']} onSelect={handleCategorySelect} label="Category" />
+                <Dropdown options={['room','home']} onSelect={handleCategorySelect} label="Category" />
               </div>
             </div>
             <div className='flex-row justify-center gap-2'>
@@ -359,9 +368,9 @@ const AddRoom: React.FC = () => {
                   placeholder="Sub description"
                 />
               </div>
-              <div className='my-10'>
+              {/* <div className='my-10'>
                 <StateDistrictDropdown onSelectState={handleSelectState} />
-              </div>
+              </div> */}
             </div>
             <div className='flex-col justify-center gap-2'>
               <div id="amenities" className='items-center'>
@@ -385,7 +394,7 @@ const AddRoom: React.FC = () => {
                   Amenities
                 </label>
                 <div className='flex flex-row gap-2'>
-                  <Dropdown options={['Option 1', 'Option 2', 'Option 3']} onSelect={handleAmenitySelect} label="Amenities" />
+                  <Dropdown options={['wifi', 'car parking',"locker",'camp fire']} onSelect={handleAmenitySelect} label="Amenities" />
                   <button type="button" onClick={handlePlusClick}>+</button>
                 </div>
               </div>
@@ -436,12 +445,13 @@ const AddRoom: React.FC = () => {
             </div>
             <div className="items-center">
               <label htmlFor="image" className="block text-gray-800 w-30">
-                Room Images (upto 5 images)
+                Room Images (choose 5 images below 10MB)
               </label>
               <input
                 type="file"
                 id="images"
                 name="images"
+                accept="image/*"
                 className="w-3/4 border border-gray-300 p-2 rounded-lg"
                 multiple
                 onChange={handleImageUpload}
@@ -489,8 +499,16 @@ const AddRoom: React.FC = () => {
                 ) : (
                   <>
                     <div className='flex flex-row gap-5'>
-                      <div>
-                        Location selected
+                      <div className='flex flex-col'>
+                          <div>
+                            State: {locationData?.features[0].properties?.state}
+                          </div>
+                          <div>
+                            District: {locationData?.features[0].properties?.state_district}
+                          </div>
+                          <div>
+                            Place: {locationData?.features[0].properties?.county}
+                          </div>
                       </div>
                       <div>
                         <BiReset onClick={handleReset} />
@@ -515,6 +533,8 @@ const AddRoom: React.FC = () => {
       <footer className="bg-blue-500 p-4 text-white text-center">
         <p>&copy; 2023 SojournNest. All rights reserved.</p>
       </footer>
+      {isLoading && <Loader />}
+      {isPending && <Loader />}
     </div>
   );
 };
