@@ -7,8 +7,10 @@ const adminEndpoints = {
   approveListing: "/admins/listings",
   blockListing: "/admins/listings",
   addAmenity:"/admins/amenities",
+  editAmenity:'/admins/amenities',
   getAmenity:"/admins/amenities",
   addCategory:"/admins/category",
+  editCategory:'/admins/category',
   getCategory: "/admins/category",
   deleteAmenity:"/admins/amenities",
   deleteCategory:"/admins/category"
