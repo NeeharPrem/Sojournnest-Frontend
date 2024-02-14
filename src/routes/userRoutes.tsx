@@ -3,7 +3,7 @@ import UserProfile from "../pages/user/userProfile";
 import HostHome from "../pages/userHost/userHost";
 import SelectLocation from "../pages/userHost/SelectLocation";
 import { HostDash } from "../pages/userHost/HostDashboard";
-
+import { Messanger } from "../pages/userHost/Messenger/Messanger";
 const UserRoutes = () => {
   return (
     <Routes>
@@ -12,6 +12,7 @@ const UserRoutes = () => {
       <Route path="/host" element={<HostHome />}></Route>
       <Route path="/location" element={<SelectLocation />}></Route>
       <Route path="/editRoom/:roomId" element={<SelectLocation />}></Route>
+      <Route path="/chats" element={<Messanger />}></Route>
     </Routes>
   );
 };
