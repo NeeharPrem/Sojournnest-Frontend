@@ -15,7 +15,9 @@ const userEndpoints = {
   unlist: "/users/host/listings",
   roomDataUpdate:"/users/host/listings",
   homeListings:"/users/listings",
+  searchListing: "/users/listings",
   hostgetChat:'/users/host/chat',
+  hostNewconversation:'/users/host/chat',
   addMessage:'/users/host/chat/messages',
   getMessage:'/users/host/chat/messages'
 };
