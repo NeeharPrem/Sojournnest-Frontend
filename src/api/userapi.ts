@@ -82,15 +82,19 @@ export const userProfile = async () => {
   try {
     const response = await Api.get(userEndpoints.profile); 
     return response;
-  } catch (error) {
-    console.error(error);
-    throw error;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
   }
 };
 
 export const getUser = async (id:string) => {
   try {
-   
     const response = await Api.get(`${userEndpoints.getUser}/${id}`);
     return response;
   } catch (error) {
@@ -114,6 +118,21 @@ export const getListings = async () => {
     const response = await Api.get(userEndpoints.getListings);
     return response;
   } catch (error:any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      toast.error("Something went wrong");
+      throw error
+    }
+  }
+};
+
+export const searchListing = async () => {
+  try {
+    const response = await Api.get(userEndpoints.searchListing);
+    return response;
+  } catch (error: any) {
     if (error.response) {
       const errorMessage = error.response.data.message || "Something went wrong";
       toast.error(errorMessage);
@@ -152,9 +171,8 @@ export const roomData = async (id: string| undefined) => {
 export const roomDetail = async ({ queryKey }: QueryFunctionContext<[string, string | null]>) => {
   const [_, roomId] = queryKey;
   try {
-    console.log(roomId)
     const response = await Api.get(`${userEndpoints.roomDetail}/${roomId}`);
-    console.log(response)
+    console.log(response?.data?.data,"ddd")
     return response?.data?.data;
   } catch (error) {
     if ((error as AxiosError).isAxiosError) {
@@ -220,6 +238,20 @@ export const usergetChat = async (id: string | FormData | undefined) => {
 export const hostgetChat = async (id: string | undefined) => {
   try {
     const response = await Api.get(`${userEndpoints.hostgetChat}/${id}`);
+    return response;
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+    return null;
+  }
+};
+
+export const hostNewconversation = async (users:any) => {
+  try {
+    const response = await Api.post(userEndpoints.hostNewconversation, users);
     return response;
   } catch (error) {
     if (error && (error as AxiosError).isAxiosError) {
