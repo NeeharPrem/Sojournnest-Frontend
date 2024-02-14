@@ -2,7 +2,7 @@ import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 import { JSXElementConstructor, ReactElement, ReactNode, ReactPortal, useState } from "react";
 import { roomDetail } from "../../api/userapi";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from "@tanstack/react-query";
 import Loader from '../common/Loader';
 
@@ -11,11 +11,21 @@ import Loader from '../common/Loader';
 const DetailsPage=() => {
     const [firstCalendarDate, setFirstCalendarDate] = useState(new Date());
     const { roomId } = useParams()
+    const navigate= useNavigate()
    
     const {isLoading, data: Data} = useQuery({
         queryKey: ['roomDetail',roomId as string],
         queryFn: roomDetail 
     });
+
+    const handleChatWithHost = () => {
+        navigate('/chats', { state: { userId: Data.userId._id } });
+    };
+
+    const date = new Date(Data?.createdAt);
+    const formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+    // const jdate = new Date(Data?.userId?.createdAt);
+    // const joinedDate = jdate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
 
     return !isLoading ?(
          <>
@@ -48,8 +58,8 @@ const DetailsPage=() => {
             <div className="flex flex-col justify-start w-full pt-3 pb-3">
                 <label className="[font-family:'Plus_Jakarta_Sans-Bold',Helvetica] font-bold text-[#1c140c] text-[22px] tracking-[-0.33px] leading-[27.5px] whitespace-nowrap">Amenities</label>
                 <div className="flex flex-row gap-2 pt-2">
-                    {Data?.amenities.map((item: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined)=>(
-                        <div  className="flex  items-center justify-center gap-[8px] px-[16px] py-0 bg-[#f4ede8] rounded-[12px]">
+                    {Data?.amenities.map((item: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined,index: any)=>(
+                        <div key={index} className="flex  items-center justify-center gap-[8px] px-[16px] py-0 bg-[#f4ede8] rounded-[12px]">
                             <div className="flex flex-col h-[21px] items-start">
                                 <div className="flex flex-col items-start self-stretch w-full flex-[0_0_auto]">
                                     <div className="rw-fit mt-[-1.00px] [font-family:'Plus_Jakarta_Sans-Medium',Helvetica] font-medium text-[#1c140c] text-[14px] tracking-[0] leading-[21px] whitespace-nowrap">
@@ -66,6 +76,24 @@ const DetailsPage=() => {
                     <p>
                         {Data?.description}
                     </p>
+            </div>
+            <div className="pb-3 flex flex-row justify-between">
+                <div>
+                    <h1 className='font-bold text-xl'>Host</h1>
+                    <div className="flex items-center space-x-4">
+                        <img src={Data?.userId?.profilePic ? Data.userId.profilePic : "https://res.cloudinary.com/db5rtuzcw/image/upload/v1705087621/profile-pics/ldyrmmxsfsq2p2zoaefx.png"} alt="card" className="w-10 h-10 rounded-full" />
+                        <div>
+                            <p className="font-semibold">{Data?.userId?.fname} {Data?.userId?.lname}</p>
+                            {/* <p>Joined on {joinedDate}</p> */}
+                        </div>
+                    </div>
+                    {Data?.name} is hosted on {formattedDate}
+                </div>
+                <div>
+                    <button onClick={handleChatWithHost} className="bg-yellow-400 text-white font-bold py-2 px-4 rounded-full">
+                        Chat with Host
+                    </button>
+                </div>
             </div>
             <div className="flex flex-col justify-start w-full pb-3">
                 <label className="[font-family:'Plus_Jakarta_Sans-Bold',Helvetica] font-bold text-[#1c140c] text-[22px] tracking-[-0.33px] leading-[27.5px] whitespace-nowrap">When you'll be there</label>
