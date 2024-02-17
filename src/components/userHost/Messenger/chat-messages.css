@@ -1,0 +1,8 @@
+/* ChatComponent.css */
+.chat-messages::-webkit-scrollbar {
+    display: none;
+}
+
+.chat-messages {
+    scrollbar-width: none; /* For Firefox */
+}
