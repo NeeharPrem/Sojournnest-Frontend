@@ -46,7 +46,7 @@ export const Messanger = () => {
     //socket io config
     useEffect(() => {
         socket.emit("addUser", userId);
-        socket.on("getUsers", (users) => {
+        socket.on("getUsers", (_users) => {
         });
     }, []);
 
