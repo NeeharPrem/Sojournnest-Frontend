@@ -1,14 +1,17 @@
 import React, { useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
+import { Badge} from "@material-tailwind/react";
 import { useMutation } from "@tanstack/react-query";
 import { addMessage } from '../../../api/userapi';
 import socket from "../../../services/socket";
 import { format } from 'timeago.js';
+import './chat-messages.css'
 
 interface ChatMessage {
     conversationId?: string;
     createdAt?: number | Date;
     sender: string;
     text: string;
+    timestamp: Date | string;
     updatedAt?: string;
     __v?: number;
     _id?: string;
@@ -23,6 +26,7 @@ interface ChatComponentProps {
     fname: string | undefined
     lname: string | undefined
     image: string | undefined
+    lastSeen:Date | undefined
     lstmsg: () => void;
 }
 
@@ -31,6 +35,7 @@ interface Messagee {
     createdAt?: number | Date;
     sender: string;
     text: string;
+    timestamp:Date | string;
     updatedAt?: string;
     __v?: number;
     _id?: string;
@@ -41,7 +46,7 @@ interface UserStatus {
     online?: boolean;
 }
 
-const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, convId, rcv,fname,lname,image,lstmsg}) => {
+const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, convId, rcv,fname,lname,image,lastSeen,lstmsg}) => {
     const [message, setMessage] = useState<string>('');
     const [arrivalMessage, setArrivalMessage] = useState<Messagee | null>(null);
     const [displayMessages, setDisplayMessages] = useState<ChatMessage[]>([]);
@@ -81,6 +86,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, co
                 senderId: Me,
                 receiverId: rcv,
                 text: message,
+                timestamp: new Date().toISOString()
             });
             update(data);
             setMessage('');
@@ -89,10 +95,13 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, co
 
     useEffect(() => {
         socket.on("getMessage", (data) => {
+            console.log(data,"data")
             setArrivalMessage({
                 sender: data.senderId,
                 text: data.text,
+                timestamp:data.timestamp
             });
+            lstmsg()
         });
     }, []);
 
@@ -150,45 +159,68 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, co
         );
     };
 
-    const formatLastSeen = (lastSeenDate?: Date) => {
-        if (!lastSeenDate) return 'Unavailable';
-
-        const now = new Date();
-        if (isSameDay(lastSeenDate, now)) {
-            return `Last seen: ${lastSeenDate.getHours()}:${lastSeenDate.getMinutes().toString().padStart(2, '0')}`;
-        } else {
-            return `Last seen: ${lastSeenDate.toLocaleString()}`;
+    const formatLastSeen = (lastSeenDateParam?: Date | undefined) => {
+        const safeLastSeenDate = lastSeenDateParam || userStatus.lastSeen || new Date();
+        if (!safeLastSeenDate || isNaN(new Date(safeLastSeenDate).getTime())) {
+            return 'Last seen: Unavailable';
         }
+        const lastSeenDate = new Date(safeLastSeenDate);
+        const now = new Date();
+
+        let timeString = '';
+        if (isSameDay(lastSeenDate, now)) {
+            let hours = lastSeenDate.getHours();
+            const minutes = lastSeenDate.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            timeString = `Last seen today at ${hours}:${minutes} ${ampm}`;
+        } else {
+            const datePart = lastSeenDate.toLocaleDateString();
+            let hours = lastSeenDate.getHours();
+            const minutes = lastSeenDate.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            timeString = `Last seen: ${datePart} at ${hours}:${minutes} ${ampm}`;
+        }
+
+        return timeString;
     };
 
+
     return (
-        <div className="flex flex-col bg-gray-100 h-screen">
-            <div className="flex items-center justify-between bg-green-300 text-black p-2 h-16">
-                <div className="flex items-center space-x-2">
-                    <img
-                        src={image}
-                        alt="avatar"
-                        className="w-8 h-8 rounded-full"
-                    />
-                    <span className="font-bold text-black">{fname} {lname}</span>
-                    <div className="text-sm text-gray-600">
-                        {userStatus.online ? 'Online' : formatLastSeen(userStatus.lastSeen)}
+            <>
+            <div className="flex items-center justify-between text-black p-2 lg:border-b-2">
+                <div className="flex flex-col items-center space-x-2">
+                    <div className='flex flex-row gap-2'>
+                        <img
+                            src={image}
+                            alt="avatar"
+                            className="w-8 h-8 rounded-full"
+                        />
+                        {/* <Badge className='bg-green-600'>
+                        </Badge> */}
+                        <div className="flex flex-col text-sm text-gray-600">
+                            <span className="font-bold text-black">{fname} {lname}</span>
+                            {userStatus.online ? 'Online' : formatLastSeen(lastSeen)}
+                        </div>
                     </div>
                 </div>
             </div>
-            <div className="flex-1 p-4 overflow-y-auto">
+            <div className="flex-1 p-4 overflow-y-auto scrollbar-width-none chat-messages">
                 {displayMessages && displayMessages.map((item) => (
                     <div
                         key={item._id}
-                        className={`flex ${item.sender === Me ? 'justify-end' : 'justify-start'} mb-2`}
+                        className={`flex ${item.sender === Me ? 'justify-end ' : 'justify-start '} mb-2 `}
                     >
                         <div
-                            className={`${item.sender === Me ? 'bg-green-500 text-white' : 'bg-white text-black'
+                            className={`${item.sender === Me ? 'bg-green-500 text-white' : 'bg-gray-600 text-black'
                                 } px-4 py-2 rounded-lg`}
                         >
                             {item.text}
                             <div className="text-xs text-black">
-                                {item.createdAt ? format(new Date(item.createdAt)) : "timestamp unavailable"}
+                                {item.createdAt || item.timestamp ? format(new Date(item.createdAt || item.timestamp)) : "timestamp unavailable"}
                             </div>
                         </div>
                     </div>
@@ -212,7 +244,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, co
                     </button>
                 </form>
             </div>
-        </div>
+            </>
     );
 };
 
