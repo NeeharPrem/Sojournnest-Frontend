@@ -1,5 +1,4 @@
 import React, { useState, ChangeEvent, FormEvent, useEffect, useRef } from 'react';
-import { Badge} from "@material-tailwind/react";
 import { useMutation } from "@tanstack/react-query";
 import { addMessage } from '../../../api/userapi';
 import socket from "../../../services/socket";
