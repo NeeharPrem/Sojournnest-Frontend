@@ -19,6 +19,7 @@ export const Messanger = () => {
         fname?: string;
         lname?: string;
         image?: string;
+        lastSeen?:Date
     }>({});
 
     const { mutate: addNewconv } = useMutation({
@@ -46,7 +47,6 @@ export const Messanger = () => {
     useEffect(() => {
         socket.emit("addUser", userId);
         socket.on("getUsers", (users) => {
-            console.log("socket");
         });
     }, []);
 
@@ -92,10 +92,14 @@ export const Messanger = () => {
     let membersWithConvoId = [];
     if (conversations.length > 0) {
         membersWithConvoId = conversations.flatMap(conv =>
-            conv.members.filter((memberId: string | null) => memberId !== userId).map((memberId: any) => ({
-                memberId,
-                conversationId: conv._id,
-            }))
+            conv.members
+                .filter((member: { userId: string | null; }) => member.userId !== userId)
+                .map((member: {
+                    lastSeen:Date; userId: any;}) => ({
+                    memberId: member.userId,
+                    conversationId: conv._id,
+                    lastSeen:member.lastSeen
+                }))
         );
     }
 
@@ -108,6 +112,7 @@ export const Messanger = () => {
         })),
     });
 
+    
     const messageQueries = useQueries({
         queries: membersWithConvoId.map(({ conversationId }) => ({
             queryKey: ['messages', conversationId],
@@ -116,11 +121,11 @@ export const Messanger = () => {
             meta: { conversationId },
         })),
     });
-
+    
     const lastmsg=messageQueries.map((items)=>(
         items.data?.data
     ))
-
+console.log(lastmsg,"kdkd")
     // refetch
     const refetchAllMessages = () => {
         messageQueries.forEach(query => {
@@ -135,21 +140,25 @@ export const Messanger = () => {
         return {
             user: queryResult.isSuccess && queryResult.data ? queryResult.data.data : null,
             conversationId: member.conversationId,
+            lastSeen: member.lastSeen,
         };
-    }).filter(userConvo => userConvo.user !== null); 
+    }).filter(userConvo => userConvo.user !== null);
 
     const handleConversationSelect = (userId: string, conversationId: string) => {
         setSelectedUserId(userId);
         setConversationIdSelected(conversationId);
-        const selectedUser = usersWithConvoId.find(userWithConvo => userWithConvo.user._id === userId)?.user;
-        if (selectedUser) {
+        const selectedUserConvo = usersWithConvoId.find(userWithConvo => userWithConvo.user._id === userId);
+        console.log(selectedUserConvo,"convo")
+        if (selectedUserConvo) {
             setSelectedUserDetails({
-                fname: selectedUser.fname,
-                lname: selectedUser.lname,
-                image: selectedUser.profilePic,
+                fname: selectedUserConvo.user.fname,
+                lname: selectedUserConvo.user.lname,
+                image: selectedUserConvo.user.profilePic,
+                lastSeen: selectedUserConvo.lastSeen,
             });
         }
     };
+
 
     const { data: messageData,refetch} = useQuery({
         queryKey: ["messageData", conversationIdSelected],
@@ -159,10 +168,10 @@ export const Messanger = () => {
     const message= messageData?.data
     
     return (
-        <div className="">
+            <>
             <Header />
-            <div className="flex lg:px-16 px-5 sm:px-10 md:px-10 pt-20">
-                <div className="flex bg-blue-gray-300 w-80 h-screen border-r-4">
+            <div className="h-screen flex flex-row lg:px-16 px-3 sm:px-10 md:px-10 pt-20 lg:pb-3">
+                <div className="border">
                     <ErrorBoundary>
                         <ConversationList
                             lastMsg={lastmsg}
@@ -171,7 +180,7 @@ export const Messanger = () => {
                         />
                     </ErrorBoundary>
                 </div>
-                <div className="lg:w-full">
+                <div className="w-full flex flex-col border">
                     {conversationIdSelected ? (
                         <ChatComponent
                             refetch={refetch}
@@ -182,6 +191,7 @@ export const Messanger = () => {
                             fname={selectedUserDetails.fname}
                             lname={selectedUserDetails.lname}
                             image={selectedUserDetails.image}
+                            lastSeen={selectedUserDetails.lastSeen}
                             lstmsg={refetchAllMessages}
                         />
                     ) : (
@@ -191,6 +201,6 @@ export const Messanger = () => {
                     )}
                 </div>
             </div>
-        </div>
+            </>
     );
 };
