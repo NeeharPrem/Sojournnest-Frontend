@@ -51,6 +51,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, co
     const [displayMessages, setDisplayMessages] = useState<ChatMessage[]>([]);
     const [userStatus, setUserStatus] = useState<UserStatus>({});
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -119,7 +120,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, co
             socket.emit("addUser", Me);
         }
 
-        // Listen for broad updates about online users
         socket.on("usersOnline", (onlineUsers) => {
             const user = onlineUsers.find((user: { userId: string | undefined; }) => user.userId === rcv);
             if (user) {
@@ -130,7 +130,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, co
             }
         });
 
-        // Listen for updates when a user's status changes
         socket.on("userStatusChanged", (userStatus) => {
             if (userStatus.userId === rcv) {
                 const lastSeen = new Date(userStatus.lastSeen);
@@ -142,7 +141,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, co
             }
         });
 
-        // Cleanup on unmount to avoid memory leaks
         return () => {
             socket.off("addUser");
             socket.off("usersOnline");
@@ -159,9 +157,9 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ refetch, messages, Me, co
     };
 
     const formatLastSeen = (lastSeenDateParam?: Date | undefined) => {
-        const safeLastSeenDate = lastSeenDateParam || userStatus.lastSeen || new Date();
+        const safeLastSeenDate = lastSeenDateParam || userStatus.lastSeen;
         if (!safeLastSeenDate || isNaN(new Date(safeLastSeenDate).getTime())) {
-            return 'Last seen: Unavailable';
+            return '';
         }
         const lastSeenDate = new Date(safeLastSeenDate);
         const now = new Date();
