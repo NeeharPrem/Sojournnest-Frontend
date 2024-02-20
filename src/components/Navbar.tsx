@@ -17,7 +17,7 @@ interface RootState {
   };
 }
 
-const Header = () => {
+const NavBar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const { userLoggedin } = useSelector((state: RootState) => state.auth);
@@ -55,7 +55,7 @@ const Header = () => {
 
   return (
     <>
-      <div className="shadow-md w-full top-0 left-0 fixed lg:px-6 px-5 md:px-5 bg-white">
+      <div className="shadow-md w-full top-0 left-0 fixed lg:px-6 px-5 md:px-5 bg-white z-50">
         <div className="md:flex items-center justify-between bg-white py-4 md:px-10">
           {/* logo section */}
           <div className="font-medium text-2xl cursor-pointer flex items-center gap-1">
@@ -99,4 +99,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default NavBar;
