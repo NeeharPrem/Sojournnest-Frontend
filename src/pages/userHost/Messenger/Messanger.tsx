@@ -36,20 +36,17 @@ export const Messanger = () => {
     const location = useLocation();
     const rcvId = location.state?.userId;
 
-    // Fetch conversations
     const { data: chatList, isSuccess } = useQuery({
         queryKey: ['chatData', userId],
         queryFn: () => hostgetChat(userId!),
         enabled: !!userId,
     });
 
-    //socket io config
     useEffect(() => {
         socket.emit("addUser", userId);
         socket.on("getUsers", (_users) => {
         });
     }, []);
-
 
     useEffect(() => {
         if (isSuccess && chatList?.data?.conv) {
@@ -57,7 +54,6 @@ export const Messanger = () => {
         }
     }, [chatList, isSuccess]);
 
-    // check rcvId
     useEffect(() => {
         if (rcvId) {
             getUser(rcvId).then((response: { data: any; }) => {
@@ -70,13 +66,11 @@ export const Messanger = () => {
                 setSelectedUserId(rcvId);
             });
 
-            // Check if there's already a conversation with the rcvId
             const existingConversation = conversations.find(conv =>
                 conv.members.includes(rcvId)
             );
 
             if (existingConversation) {
-                // If conversation exists, select it
                 setConversationIdSelected(existingConversation._id);
             } else {
                 const users={
@@ -125,8 +119,7 @@ export const Messanger = () => {
     const lastmsg=messageQueries.map((items)=>(
         items.data?.data
     ))
-console.log(lastmsg,"kdkd")
-    // refetch
+
     const refetchAllMessages = () => {
         messageQueries.forEach(query => {
             if (query.refetch) {
