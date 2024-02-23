@@ -4,6 +4,7 @@ import HostHome from "../pages/userHost/userHost";
 import SelectLocation from "../pages/userHost/SelectLocation";
 import { HostDash } from "../pages/userHost/HostDashboard";
 import { Messanger } from "../pages/userHost/Messenger/Messanger";
+import Wishlist from "../pages/user/wishlist/wishlist";
 const UserRoutes = () => {
   return (
     <Routes>
@@ -13,6 +14,7 @@ const UserRoutes = () => {
       <Route path="/location" element={<SelectLocation />}></Route>
       <Route path="/editRoom/:roomId" element={<SelectLocation />}></Route>
       <Route path="/chats" element={<Messanger />}></Route>
+      <Route path="/wishlist" element={<Wishlist/>}></Route>
     </Routes>
   );
 };
