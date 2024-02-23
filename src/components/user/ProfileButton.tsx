@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 interface ProfileMenu {
   userInfo: {
@@ -14,15 +15,17 @@ interface ProfileMenu {
 const ProfileMenu: React.FC<ProfileMenu> = ({ userInfo }) => {
   const [selectedOption, setSelectedOption] = useState("Bookings");
   const [showOptions, setShowOptions] = useState(false);
+  const usenavigate = useNavigate()
 
   const optionHandler = (val: string) => {
-    // Handle the selected option if needed
+    usenavigate('/wishlist')
   };
 
   const options = [
     { label: "Bookings", value: "Bookings" },
     { label: "Booking History", value: "BookingHistory" },
     { label: "Wallet History", value: "WalletHistory" },
+    {label: "Wishlist",value:"Wislist"}
   ];
   return (
     <div className="flex flex-col items-center lg:w-80">
