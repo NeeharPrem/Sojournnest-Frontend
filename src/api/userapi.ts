@@ -172,7 +172,6 @@ export const roomDetail = async ({ queryKey }: QueryFunctionContext<[string, str
   const [_, roomId] = queryKey;
   try {
     const response = await Api.get(`${userEndpoints.roomDetail}/${roomId}`);
-    console.log(response?.data?.data,"ddd")
     return response?.data?.data;
   } catch (error) {
     if ((error as AxiosError).isAxiosError) {
@@ -183,6 +182,44 @@ export const roomDetail = async ({ queryKey }: QueryFunctionContext<[string, str
     return null;
   }
 };
+
+export const addtoWishlist = async (id: string) => {
+  try {
+    const response = await Api.put(`${userEndpoints.addtoWishlist}/${id}`);
+    return response;
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    if (axiosError.isAxiosError) {
+      const message = axiosError.response?.status === 400
+        && axiosError.response?.data as string;
+      toast.error(message);
+    } else {
+      toast.error("Something went wrong");
+    }
+    return null;
+  }
+};
+
+export const getWishlist = async (roomId: string | undefined)=>{
+  try{
+    const response = await Api.get(`${userEndpoints.getWishlist}/${roomId}`)
+    console.log(response)
+    return response
+  }catch(error){
+
+  }
+}
+
+export const removeWishlist = async (roomId: string | undefined)=>{
+  try{
+    console.log(roomId)
+    const response = await Api.patch(`${userEndpoints.removeWishlist}/${roomId}`)
+    console.log(response)
+    return response
+  }catch(error){
+
+  }
+}
 
 export const unlist = async (id: string) => {
   try {
