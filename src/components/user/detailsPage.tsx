@@ -1,14 +1,14 @@
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
-import { JSXElementConstructor, ReactElement, ReactNode, ReactPortal, useState } from "react";
-import { roomDetail } from "../../api/userapi";
+import { JSXElementConstructor, ReactElement, ReactNode, ReactPortal, useState,useEffect} from "react";
+import { roomDetail, addtoWishlist, getWishlist, removeWishlist } from "../../api/userapi";
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery,useMutation} from "@tanstack/react-query";
 import Loader from '../common/Loader';
-
-
+import { toast } from 'react-toastify';
 
 const DetailsPage=() => {
+    const [wishlist,setWishlist]=useState(false)
     const [firstCalendarDate, setFirstCalendarDate] = useState(new Date());
     const { roomId } = useParams()
     const navigate= useNavigate()
@@ -20,6 +20,53 @@ const DetailsPage=() => {
 
     const handleChatWithHost = () => {
         navigate('/chats', { state: { userId: Data.userId._id } });
+    };
+
+    const {mutate: Wishlist}= useMutation({
+        mutationFn: addtoWishlist,
+        onSuccess:(response)=>{
+            if (response?.status === 200) {
+                toast.success(response.data)
+                setWishlist(true)
+            }
+        }
+    })
+
+    const { mutate: removWishlist } = useMutation({
+        mutationFn: removeWishlist,
+        onSuccess: (response) => {
+            if (response?.status === 200) {
+                setWishlist(false)
+                toast.success(response.data.message)
+            }
+        }
+    })
+
+    const { data:wishlistData } = useQuery({
+        queryKey: ['wishlist', roomId],
+        queryFn: () => getWishlist(roomId),
+    });
+
+    useEffect(() => {
+        if (wishlistData?.data) {
+            setWishlist(wishlistData.data);
+        }
+    }, [wishlistData]);
+
+    const handleWishlist =()=>{
+        Wishlist(Data?._id)
+    }
+
+    const remove=()=>{
+        removWishlist(Data?._id)
+    }
+
+    const conditionalHandleWishlist = () => {
+        if (!wishlist) {
+            handleWishlist();
+        }else{
+            remove()
+        }
     };
 
     const date = new Date(Data?.createdAt);
@@ -37,8 +84,8 @@ const DetailsPage=() => {
                     </div>
                 </div>
                 <div className="flex justify-center items-center p-2">
-                    <button className="bg-gray-500 text-white font-bold py-2 px-4 rounded-full">
-                        Save
+                    <button onClick={conditionalHandleWishlist} className="bg-gray-500 text-white font-bold py-2 px-4 rounded-full">
+                        {wishlist ? ('Remove wishlist') : ('wishlist')}
                     </button>
                 </div>
             </div>
