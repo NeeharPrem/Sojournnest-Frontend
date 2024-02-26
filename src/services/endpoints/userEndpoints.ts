@@ -17,12 +17,14 @@ const userEndpoints = {
   homeListings:"/users/listings",
   addtoWishlist:'/users/wishlist',
   getWishlist: '/users/wishlist',
+  userWishlists:'/users/wishlist',
   removeWishlist:'/users/wishlist',
   searchListing: "/users/listings",
   hostgetChat:'/users/host/chat',
   hostNewconversation:'/users/host/chat',
   addMessage:'/users/host/chat/messages',
-  getMessage:'/users/host/chat/messages'
+  getMessage:'/users/host/chat/messages',
+  checkDateAvailability:'/users/bookings'
 };
 
 export default userEndpoints;
