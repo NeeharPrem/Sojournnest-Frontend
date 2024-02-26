@@ -212,11 +212,20 @@ export const getWishlist = async (roomId: string | undefined)=>{
 
 export const removeWishlist = async (roomId: string | undefined)=>{
   try{
-    console.log(roomId)
     const response = await Api.patch(`${userEndpoints.removeWishlist}/${roomId}`)
     console.log(response)
     return response
   }catch(error){
+
+  }
+}
+
+export const userWishlists = async () => {
+  try {
+    const response = await Api.get(userEndpoints.userWishlists)
+    console.log(response)
+    return response
+  } catch (error) {
 
   }
 }
@@ -323,5 +332,21 @@ export const getMessage = async (id: string | undefined) => {
   } catch (error) {
     console.error(error);
     throw error;
+  }
+}
+
+export const checkDateAvailability = async (Data:object) => {
+  try {
+    const response = await Api.post(userEndpoints.checkDateAvailability,Data);
+    console.log(response)
+    return response;
+  } catch (error:any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
   }
 };
