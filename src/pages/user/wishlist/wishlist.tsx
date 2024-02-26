@@ -1,5 +1,5 @@
 import NavBar from "../../../components/Navbar";
-import Wish from "../../../components/user/wish.tsx/wish";
+import Wish from "../../../components/user/wishlist/wish";
 const Wishlist = () => {
 
     return (
