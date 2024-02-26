@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { allListings } from "../../api/userapi";
 import { useNavigate } from "react-router-dom";
 import SkeletonLoader from "./HomeSkeleton";
 import { useState, useEffect } from "react";
+import SearchBar from "./home/serchBar";
 
 interface Room {
   name: string;
@@ -23,17 +24,22 @@ const HomePage = () => {
   const [filterActive, setFilterActive] = useState<boolean>(false);
   const [filteredData, setFilteredData] = useState<Room[]>([]);
   const [roomType, setRoomType] = useState<'room' | 'home' | ''>('');
-
-  const { data: Data, isLoading } = useQuery<Room[], Error>({
-    queryKey: ["roomData"],
-    queryFn: allListings,
+  const [page, setPage] = useState(1);
+    
+  
+  const queryClient = useQueryClient(); 
+  const { data: Data, isLoading } = useQuery({
+    queryKey: ["roomData", page], 
+    queryFn: () => allListings(page),
+    // keepPreviousData: true,
   });
 
   const navigate = useNavigate();
 
   useEffect(() => {
     if (Data) {
-      let processedData = [...Data?.data];
+      const newData= Data?.data
+      let processedData = [...newData];
 
       // Assuming you want to toggle between showing all and showing only active
       if (filterActive) {
@@ -74,12 +80,26 @@ const HomePage = () => {
     setRoomType('');
   };
 
+  const handleShowMore = () => {
+    setPage((prevPage) => prevPage + 1); // Increase page by 1
+  };
+
+  useEffect(() => {
+    if (Data?.hasMore) { // Assuming your API returns a hasMore flag
+      queryClient.prefetchQuery({ queryKey: ["roomData", page + 1], queryFn: () => allListings(page + 1) });
+    }
+  }, [Data, page, queryClient]);
+
+
   return (
     <>
         <div id="banner" className="w-full justify-center items-center pb-3">
           <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-997566368472977053/original/2b023175-6872-4202-ace0-29bc06504385.jpeg?im_w=960" alt="Card" className="w-full lg:h-72 object-cover" />
         </div>
-      <div id="bar" className="flex flex-row justify-between border-b-2 border-t-2 p-3">
+        <div className="flex flex-row">
+        <SearchBar />
+        </div>
+      {/* <div id="bar" className="flex flex-row justify-between border-b-2 border-t-2 p-3">
         <div>
           <input
             type="text"
@@ -110,13 +130,13 @@ const HomePage = () => {
             </button>
         </div>
         </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-5 my-7  items-center">
+      </div> */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 my-4 items-center">
         {isLoading ? (
           Array.from({ length: 8 }).map((_, index) => <SkeletonLoader key={index} />)
         ) : (
             filteredData.map(room => (
-              <div key={room._id} onClick={() => navigate(`/details/${room._id}`)} className="w-full cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-lg overflow-hidden">
+              <div key={room._id} onClick={() => navigate(`/details/${room._id}`)} className="w-full cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-lg overflow-hidden rounded-sm">
                 <img src={room.images[0]} alt="card" className="w-full h-40 object-cover" />
                 <div className="flex flex-col p-4">
                   <h2 className="text-xl font-bold mb-2">{room.name}</h2>
@@ -126,6 +146,16 @@ const HomePage = () => {
               </div>
             ))
         )}
+        </div>
+        <div>
+          <div className="flex justify-center">
+          {!isLoading &&(
+            <button className="cursor-pointer transition-all bg-black text-white px-6 py-2 rounded-lg
+border-b-[4px]">
+              Show More
+            </button>
+          )}
+          </div>
         </div>
     </>
   );
