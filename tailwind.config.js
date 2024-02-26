@@ -6,7 +6,11 @@ module.exports = withMT({
     colors: {
       'cream': '#F1F5F9',
     },
-    extend: {},
+    extend: {
+      fontSize: {
+        'custom-size': '4rem',
+      },
+    },
   },
   plugins: [],
 });
