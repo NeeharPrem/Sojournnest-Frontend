@@ -2,42 +2,79 @@ import { useQuery,useMutation } from "@tanstack/react-query"
 import { RootState } from '../../../store/store';
 import { useSelector } from "react-redux";
 import { userWishlists } from "../../../api/userapi";
-
+import Loader from "../../common/Loader";
+import { removeWishlist } from "../../../api/userapi";
+import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const Wish = () => {
     const userId = useSelector((state: RootState) => state.auth.userId);
     
     const {
-        data: Data,
+        data: Data,isLoading
     } = useQuery({
-        queryKey: ["wishListData"],
+        queryKey: ["wishListData",],
         queryFn: userWishlists,
     });
-    console.log(Data,'wish')
-    return (
+
+    const { mutate: removWishlist } = useMutation({
+        mutationFn: removeWishlist,
+        onSuccess: (response) => {
+            if (response?.status === 200) {
+                toast.success(response.data.message)
+            }
+        }
+    })
+
+    const handleRemove = (event: React.MouseEvent<HTMLButtonElement>) => {
+        const button = event.target as HTMLButtonElement;
+        const Id = button.getAttribute('data-id') || '';
+        console.log('am hee', Id);
+        removWishlist(Id);
+    };
+
+    return !isLoading ?(
         <>
             <div className="px-3">
-                <p>Profile/wishlist</p>
+                <Link to="/profile">Profile</Link> / Wishlist
             </div>
             <div className="lg:px-3">
-                <p className="font-bold text-custom-size">Wislist</p>
+                <p className="font-bold text-custom-size">Wishlist</p>
             </div>
             <div className="flexbg-blue-gray-500 px-5">
-                <div className="flex flex-row justify-between px-5 bg-green-400 w-full">
-                    <div className="flex flex-row gap-2">
-                        <div>
-                            <p>images</p>
+                {Data?.data.roomId.map((room: {
+                    images: [string]; _id: string; name: string; bedrooms: string; guests: string; bathrooms:string}) =>
+                    <div key={room._id} className="flex flex-row justify-between items-center p-5 w-full shadow-md rounded-md border">
+                        <div className="flex flex-row gap-2">
+                            <div>
+                                <img
+                                    src={`${room?.images[0]}`}
+                                    alt="Profile Pic"
+                                    className="lg:w-20 lg:h-20  object-cover rounded-md"
+                                />
+                            </div>
+                            <div className="lg:pt-3">
+                                <div className="flex flex-row gap-1">
+                                    <p>{room.name} .</p>
+                                    <p>{room.bedrooms} Bedrooms</p>
+                                </div>
+                                <div className="flex flex-row gap-1">
+                                    <p>{room.guests} Guests .</p>
+                                    <p>{room.bathrooms} Bathrooms .</p>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <p>text</p>
+                        <div >
+                            <button onClick={handleRemove} data-id={room._id} className="border p-1 rounded-md bg-blue-gray-200">
+                                Remove
+                            </button>
                         </div>
                     </div>
-                    <div>
-                        <h1>X</h1>
-                    </div>
-                </div>
+                )}
             </div>
         </>
+    ):(
+        <Loader/>
     )
 }
 
