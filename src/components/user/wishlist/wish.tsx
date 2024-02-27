@@ -1,6 +1,4 @@
 import { useQuery,useMutation } from "@tanstack/react-query"
-import { RootState } from '../../../store/store';
-import { useSelector } from "react-redux";
 import { userWishlists } from "../../../api/userapi";
 import Loader from "../../common/Loader";
 import { removeWishlist } from "../../../api/userapi";
@@ -8,8 +6,7 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
 const Wish = () => {
-    const userId = useSelector((state: RootState) => state.auth.userId);
-    
+   
     const {
         data: Data,isLoading
     } = useQuery({
