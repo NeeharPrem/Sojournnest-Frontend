@@ -222,8 +222,7 @@ export const removeWishlist = async (roomId: string | undefined)=>{
 
 export const userWishlists = async () => {
   try {
-    const response = await Api.get(userEndpoints.userWishlists)
-    console.log(response)
+    const response = await Api.get(`${userEndpoints.userWishlists}`)
     return response
   } catch (error) {
 
