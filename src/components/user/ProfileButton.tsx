@@ -15,17 +15,27 @@ interface ProfileMenu {
 const ProfileMenu: React.FC<ProfileMenu> = ({ userInfo }) => {
   const [selectedOption, setSelectedOption] = useState("Bookings");
   const [showOptions, setShowOptions] = useState(false);
-  const usenavigate = useNavigate()
+  const navigate = useNavigate()
 
   const optionHandler = (val: string) => {
-    usenavigate('/wishlist')
+    switch (val) {
+      case "Bookings":
+        navigate('/bookings');
+        break;
+      case "BookingHistory":
+      case "Wishlist":
+        navigate('/wishlist');
+        break;
+      default:
+        navigate('/');
+    }
   };
 
   const options = [
     { label: "Bookings", value: "Bookings" },
-    { label: "Booking History", value: "BookingHistory" },
-    { label: "Wallet History", value: "WalletHistory" },
-    {label: "Wishlist",value:"Wislist"}
+    // { label: "Booking History", value: "BookingHistory" },
+    // { label: "Wallet History", value: "WalletHistory" },
+    {label: "Wishlist",value:"Wishlist"}
   ];
   return (
     <div className="flex flex-col items-center lg:w-80">
