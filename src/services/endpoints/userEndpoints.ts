@@ -24,7 +24,10 @@ const userEndpoints = {
   hostNewconversation:'/users/host/chat',
   addMessage:'/users/host/chat/messages',
   getMessage:'/users/host/chat/messages',
-  checkDateAvailability:'/users/bookings'
+  getBookings: '/users/bookings',
+  cancelBooking:'/users/bookings',
+  checkDateAvailability:'/users/bookings/check-availability',
+  payment:'users/bookings'
 };
 
 export default userEndpoints;
