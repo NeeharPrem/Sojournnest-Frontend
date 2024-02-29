@@ -1,15 +1,23 @@
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 import { JSXElementConstructor, ReactElement, ReactNode, ReactPortal, useState,useEffect} from "react";
-import { roomDetail, addtoWishlist, getWishlist, removeWishlist } from "../../api/userapi";
+import { roomDetail, addtoWishlist, getWishlist, removeWishlist, checkDateAvailability,payment} from "../../api/userapi";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery,useMutation} from "@tanstack/react-query";
 import Loader from '../common/Loader';
 import { toast } from 'react-toastify';
 
+
 const DetailsPage=() => {
     const [wishlist,setWishlist]=useState(false)
-    const [firstCalendarDate, setFirstCalendarDate] = useState(new Date());
+    const [checkInDate, setCheckInDate] = useState("");
+    const [checkOutDate, setCheckOutDate] = useState('');
+    const [isCheckInSelected, setIsCheckInSelected] = useState(true);
+    const [minCheckoutDate, setMinCheckoutDate] = useState(new Date());
+    const [isAvailable, setIsAvailable] = useState(false);
+    const [adultCount, setAdultCount] = useState(1);
+    const [kidCount, setKidCount] = useState(0);
+
     const { roomId } = useParams()
     const navigate= useNavigate()
    
@@ -17,6 +25,13 @@ const DetailsPage=() => {
         queryKey: ['roomDetail',roomId as string],
         queryFn: roomDetail 
     });
+
+    const { mutate: paymentSession } = useMutation({
+        mutationFn: payment,
+        onSuccess: (response:any) => {
+            window.location.href = response.data.url;
+        }
+    })
 
     const handleChatWithHost = () => {
         navigate('/chats', { state: { userId: Data.userId._id } });
@@ -71,8 +86,93 @@ const DetailsPage=() => {
 
     const date = new Date(Data?.createdAt);
     const formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-    // const jdate = new Date(Data?.userId?.createdAt);
-    // const joinedDate = jdate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+
+    const formatDate = (date: Date) => {
+        const d = new Date(date);
+        const day = d.getDate();
+        const month = d.getMonth() + 1;
+        const year = d.getFullYear();
+        return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+    };
+
+    const handleDateChange = (value: Date) => {
+        const formattedValue = formatDate(value);
+        if (isCheckInSelected) {
+            setCheckInDate(formattedValue);
+            setIsCheckInSelected(false);
+            const nextDay = new Date(value);
+            nextDay.setDate(nextDay.getDate() + 1);
+            setMinCheckoutDate(nextDay);
+        } else {
+            setCheckOutDate(formattedValue);
+            setIsCheckInSelected(true);
+        }
+    };
+
+    const resetDates = () => {
+        setCheckInDate(""); 
+        setCheckOutDate("");
+        setIsCheckInSelected(true); 
+        setMinCheckoutDate(new Date());
+        setIsAvailable(false)
+    };
+
+    const checkAvailability = async () => {
+    
+        const Data={
+            roomId,
+            checkInDate,
+            checkOutDate
+        }
+        const availability= await checkDateAvailability(Data);
+        if(availability?.status==200){
+            toast.success(availability.data.message)
+            setIsAvailable(true);
+        }else{
+            setIsAvailable(false);
+        }
+    };
+
+    const incrementAdultCount = () => {
+        if (adultCount + kidCount < Data?.guests) {
+            setAdultCount(prevCount => prevCount + 1);
+        } else {
+            toast.warn("Max guests limit reached");
+        }
+    };
+
+    const decrementAdultCount = () => {
+        if (adultCount > 1) {
+            setAdultCount(prevCount => prevCount - 1);
+        }
+    };
+
+    const incrementKidCount = () => {
+        if (adultCount + kidCount < Data?.guests) {
+            setKidCount(prevCount => prevCount + 1);
+        } else {
+            toast.warn("Max guests limit reached");
+        }
+    };
+
+    const decrementKidCount = () => {
+        if (kidCount > 0) {
+            setKidCount(prevCount => prevCount - 1);
+        }
+    };
+
+    const handleCheckout=()=>{
+        const bookingData={
+            checkInDate:checkInDate,
+            checkOutDate:checkOutDate,
+            guests:adultCount+kidCount,
+            roomId:Data._id,
+            hostId:Data.userId._id,
+            totalAmount:Data.rent
+        }
+        paymentSession(bookingData)
+    }
+
 
     return !isLoading ?(
          <>
@@ -131,7 +231,6 @@ const DetailsPage=() => {
                         <img src={Data?.userId?.profilePic ? Data.userId.profilePic : "https://res.cloudinary.com/db5rtuzcw/image/upload/v1705087621/profile-pics/ldyrmmxsfsq2p2zoaefx.png"} alt="card" className="w-10 h-10 rounded-full" />
                         <div>
                             <p className="font-semibold">{Data?.userId?.fname} {Data?.userId?.lname}</p>
-                            {/* <p>Joined on {joinedDate}</p> */}
                         </div>
                     </div>
                     {Data?.name} is hosted on {formattedDate}
@@ -144,9 +243,61 @@ const DetailsPage=() => {
             </div>
             <div className="flex flex-col justify-start w-full pb-3">
                 <label className="[font-family:'Plus_Jakarta_Sans-Bold',Helvetica] font-bold text-[#1c140c] text-[22px] tracking-[-0.33px] leading-[27.5px] whitespace-nowrap">When you'll be there</label>
-                <div className='flex flex-row justify-center gap-2 pt-3'>
+                <div className='flex flex-row justify-center gap-4 pt-3'>
                     <div>
-                        <Calendar value={firstCalendarDate} />
+                        <Calendar
+                            onChange={handleDateChange}
+                            value={isCheckInSelected ? (checkInDate ? new Date(checkInDate) : new Date()) : (checkOutDate ? new Date(checkOutDate) : new Date())}
+                            minDate={isCheckInSelected ? new Date() : minCheckoutDate}
+                            tileClassName={({ date, view }) => {
+                                if (view === 'month' && new Date().toDateString() === date.toDateString()) {
+                                    return 'calendar-tile-current-date';
+                                }
+                            }}
+                        />
+                    </div>
+                    <div>
+                        <p>check in Date: {checkInDate}</p>
+                        <p>checout Date: {checkOutDate}</p>
+                        <button onClick={resetDates} className="mt-2 bg-red-500 text-white font-bold py-1 px-4 rounded-full">
+                            Reset Dates
+                        </button>
+                        {checkInDate && checkOutDate && (
+                            <div className="flex justify-center mt-4">
+                                <button
+                                    onClick={checkAvailability}
+                                    className="bg-black text-white font-bold py-2 px-4 rounded-full"
+                                >
+                                    Check Availability
+                                </button>
+                            </div>
+                        )}
+                        {isAvailable && (
+                            <>
+                                <div className="flex justify-between items-center mt-4">
+                                    <span>Adults:</span>
+                                    <button onClick={decrementAdultCount} className="bg-red-500 text-white font-bold py-1 px-4 rounded-full">-</button>
+                                    <span>{adultCount}</span>
+                                    {adultCount < Data?.guests && (
+                                        <button onClick={incrementAdultCount} className="bg-green-500 text-white font-bold py-1 px-4 rounded-full">+</button>
+                                    )}
+                                </div>
+                                <div className="flex justify-between items-center mt-2">
+                                    <span>Kids:</span>
+                                    <button onClick={decrementKidCount} className="bg-red-500 text-white font-bold py-1 px-4 rounded-full">-</button>
+                                    <span>{kidCount}</span>
+                                    <button onClick={incrementKidCount} className="bg-green-500 text-white font-bold py-1 px-4 rounded-full">+</button>
+                                </div>
+                                <div className="flex justify-center mt-4">
+                                    <button
+                                        onClick={handleCheckout}
+                                        className="bg-green-500 text-white font-bold py-2 px-4 rounded-full"
+                                    >
+                                        Proceed to Checkout
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
