@@ -3,7 +3,7 @@ import AdminRoutes from "./routes/AdminRoutes";
 import AdminLogin from "./pages/admin/AdminLogin";
 import UserLogin from "./pages/user/userLogin";
 import UserHome from "./pages/user/home";
-import SignUp from "./components/user/SignUp";
+import UserSignup from "./pages/user/userSignup";
 import { ListingDetails } from "./pages/user/listingDetails";
 import { AdminPrivate } from "./components/common/PrivateRoute";
 import { UserPrivate } from "./components/common/userPrivateRoute";
@@ -16,7 +16,7 @@ export default function App() {
         {/* Public User Routes */}
         <Route path="/" element={<UserHome />} />
         <Route path="/login" element={<UserLogin />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signup" element={<UserSignup />} />
         <Route path='/details/:roomId' element={<ListingDetails/>}/>
 
         {/* Admin Routes */}
