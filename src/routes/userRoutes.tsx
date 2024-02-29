@@ -6,6 +6,7 @@ import { HostDash } from "../pages/userHost/HostDashboard";
 import { Messanger } from "../pages/userHost/Messenger/Messanger";
 import Wishlist from "../pages/user/wishlist/wishlist";
 import Bookings from "../pages/user/bookings/bookings";
+import SuccessOrFailure from "../pages/user/success or failure/paymentLast";
 const UserRoutes = () => {
   return (
     <Routes>
@@ -17,6 +18,8 @@ const UserRoutes = () => {
       <Route path="/chats" element={<Messanger />}></Route>
       <Route path="/wishlist" element={<Wishlist/>}></Route>
       <Route path="/bookings" element={<Bookings/>}></Route>
+      <Route path="/success" element={<SuccessOrFailure />} />
+      <Route path="/failure" element={<SuccessOrFailure />} />
     </Routes>
   );
 };
