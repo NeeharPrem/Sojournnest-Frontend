@@ -1,14 +1,14 @@
 import Navbar from "../../components/Navbar";
-import SignUp from "../../components/user/SignUp";
+import Login from "../../components/user/Login";
 
 const UserLogin = () => {
   return (
-    <>
-      <Navbar />
-      <div>
-        <SignUp />
+    <div className="overflow-y-hidden h-screen ">
+      {/* <Navbar /> */}
+      <div className="flex flex-col lg:px-11 sm:px-10 md:px-10 pt-10 bg-brown-100">
+        <Login />
       </div>
-    </>
+   </div>
   );
 };
 
