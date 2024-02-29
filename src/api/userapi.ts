@@ -200,13 +200,17 @@ export const addtoWishlist = async (id: string) => {
   }
 };
 
+
 export const getWishlist = async (roomId: string | undefined)=>{
   try{
     const response = await Api.get(`${userEndpoints.getWishlist}/${roomId}`)
-    console.log(response)
     return response
   }catch(error){
-
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
   }
 }
 
@@ -216,7 +220,11 @@ export const removeWishlist = async (roomId: string | undefined)=>{
     console.log(response)
     return response
   }catch(error){
-
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
   }
 }
 
@@ -225,7 +233,11 @@ export const userWishlists = async () => {
     const response = await Api.get(`${userEndpoints.userWishlists}`)
     return response
   } catch (error) {
-
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
   }
 }
 
@@ -349,3 +361,44 @@ export const checkDateAvailability = async (Data:object) => {
     }
   }
 };
+
+export const payment = async (Data:object) => {
+  try {
+    const response = await Api.post(userEndpoints.payment,Data);
+    return response;
+  } catch (error:any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const getBookings = async () => {
+  try {
+    const response = await Api.get(userEndpoints.getBookings)
+    return response
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
+
+export const cancelBooking = async (Id:string) => {
+  try {
+    const response = await Api.patch(`${userEndpoints.cancelBooking}/${Id}`)
+    return response
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
