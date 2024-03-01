@@ -2,21 +2,20 @@ import React, { useState, ChangeEvent, useRef, KeyboardEvent, useEffect } from "
 import { signupVerification, resendVerification } from "../../api/userapi";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 interface OTPScreenProps {
-  isLogin: boolean;
-  setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
   setIscomplete: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const OTPScreen: React.FC<OTPScreenProps> = ({
-  setIsLogin,
-  isLogin,
   setIscomplete,
 }) => {
   const [otp, setOTP] = useState<string>("");
   const [timeLeft, setTimeLeft] = useState(30);
   const [showResend, setShowResend] = useState(false);
+
+  const navigate= useNavigate()
 
   useEffect(() => {
     if (!timeLeft) {
@@ -83,8 +82,8 @@ const OTPScreen: React.FC<OTPScreenProps> = ({
       console.log(response);
       if (response?.status === 200) {
         toast.success(response?.data?.message);
-        setIsLogin(!isLogin);
         setIscomplete(false);
+        navigate('/login')
       }
     },
   });
