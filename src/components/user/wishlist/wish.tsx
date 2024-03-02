@@ -8,17 +8,19 @@ import { Link } from "react-router-dom";
 const Wish = () => {
    
     const {
-        data: Data,isLoading
+        data: Data,isLoading,refetch
     } = useQuery({
         queryKey: ["wishListData",],
         queryFn: userWishlists,
     });
 
-    const { mutate: removWishlist } = useMutation({
+
+    const { mutate: removWishlist} = useMutation({
         mutationFn: removeWishlist,
         onSuccess: (response) => {
             if (response?.status === 200) {
                 toast.success(response.data.message)
+                refetch()
             }
         }
     })
@@ -26,9 +28,26 @@ const Wish = () => {
     const handleRemove = (event: React.MouseEvent<HTMLButtonElement>) => {
         const button = event.target as HTMLButtonElement;
         const Id = button.getAttribute('data-id') || '';
-        console.log('am hee', Id);
         removWishlist(Id);
     };
+
+    if (isLoading) return <Loader />;
+
+    if (!Data?.data?.data.roomId || Data?.data?.data.roomId === 0) {
+        return (
+            <>
+                <div className="px-3">
+                    <Link to="/profile">Profile</Link> / Wishlist
+                </div>
+                <div className="lg:px-3">
+                    <p className="font-bold text-custom-size">Wishlist</p>
+                </div>
+                <div className="text-center py-10">
+                    <p>No items in your wishlist.</p>
+                </div>
+            </>
+        );
+    }
 
     return !isLoading ?(
         <>
@@ -39,7 +58,7 @@ const Wish = () => {
                 <p className="font-bold text-custom-size">Wishlist</p>
             </div>
             <div className="flexbg-blue-gray-500 px-5">
-                {Data?.data.roomId.map((room: {
+                {Data?.data?.data.roomId.map((room: {
                     images: [string]; _id: string; name: string; bedrooms: string; guests: string; bathrooms:string}) =>
                     <div key={room._id} className="flex flex-row justify-between items-center p-5 w-full shadow-md rounded-md border">
                         <div className="flex flex-row gap-2">
