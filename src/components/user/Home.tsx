@@ -1,163 +1,85 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { allListings } from "../../api/userapi";
 import { useNavigate } from "react-router-dom";
 import SkeletonLoader from "./HomeSkeleton";
-import { useState, useEffect } from "react";
-import SearchBar from "./home/serchBar";
+import { useRef, useEffect } from "react";
 
-interface Room {
-  name: string;
-  _id: string;
-  images: string[];
-  state: string;
-  district: string;
-  rent: string;
-  // Assuming you have an isActive property for filtering
-  isActive?: boolean;
-  category: 'room' | 'home';
-}
 
 const HomePage = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortField, setSortField] = useState<string>("name"); // default sorting by name
-  const [sortOrder, setSortOrder] = useState<string>("asc"); // asc or desc
-  const [filterActive, setFilterActive] = useState<boolean>(false);
-  const [filteredData, setFilteredData] = useState<Room[]>([]);
-  const [roomType, setRoomType] = useState<'room' | 'home' | ''>('');
-  const [page, setPage] = useState(1);
-    
-  
-  const queryClient = useQueryClient(); 
-  const { data: Data, isLoading } = useQuery({
-    queryKey: ["roomData", page], 
-    queryFn: () => allListings(page),
-    // keepPreviousData: true,
-  });
-
+  const observerRef = useRef(null);
   const navigate = useNavigate();
 
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+    isError,
+  } = useInfiniteQuery({
+    queryKey: ["roomData"],
+    queryFn: ({ pageParam = 1 }) => allListings(pageParam),
+    getNextPageParam: (lastPage, pages) => {
+      if (lastPage?.hasMore) {
+        return pages.length + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+  });
+
   useEffect(() => {
-    if (Data) {
-      const newData= Data?.data
-      let processedData = [...newData];
-
-      // Assuming you want to toggle between showing all and showing only active
-      if (filterActive) {
-        processedData = processedData.filter(room => room.isActive);
-      }
-
-      if (roomType) {
-        processedData = processedData.filter(room => room.category === roomType);
-      }
-
-      // Search
-      if (searchQuery) {
-        processedData = processedData.filter(room =>
-          room.name.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      }
-
-      // Sort
-      processedData.sort((a, b) => {
-        const fieldA = a[sortField].toString().toLowerCase();
-        const fieldB = b[sortField].toString().toLowerCase();
-
-        if (sortOrder === "asc") {
-          return fieldA.localeCompare(fieldB);
-        } else {
-          return fieldB.localeCompare(fieldA);
+    const observer = new IntersectionObserver(
+      entries => {
+        const [entry] = entries;
+        if (entry.isIntersecting && hasNextPage && !isError) {
+          fetchNextPage();
         }
-      });
+      },
+      {
+        rootMargin: '100px',
+      }
+    );
 
-      setFilteredData(processedData);
+    const currentElement = observerRef.current;
+    if (currentElement) {
+      observer.observe(currentElement);
     }
-  }, [Data, searchQuery, sortField, sortOrder, filterActive, roomType]);
 
-  const resetFilters = () => {
-    setSearchQuery("");
-    setSortOrder("asc");
-    setFilterActive(false); 
-    setRoomType('');
-  };
+    return () => {
+      if (currentElement) {
+        observer.unobserve(currentElement);
+      }
+    };
+  }, [hasNextPage, isError, fetchNextPage]);
 
-  const handleShowMore = () => {
-    setPage((prevPage) => prevPage + 1); // Increase page by 1
-  };
-
-  useEffect(() => {
-    if (Data?.hasMore) { // Assuming your API returns a hasMore flag
-      queryClient.prefetchQuery({ queryKey: ["roomData", page + 1], queryFn: () => allListings(page + 1) });
-    }
-  }, [Data, page, queryClient]);
-
+  const rooms = data?.pages.flatMap(page => page.data) || [];
 
   return (
     <>
-        <div id="banner" className="w-full justify-center items-center pb-3">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-997566368472977053/original/2b023175-6872-4202-ace0-29bc06504385.jpeg?im_w=960" alt="Card" className="w-full lg:h-72 object-cover" />
-        </div>
-        <div className="flex flex-row">
-        <SearchBar />
-        </div>
-      {/* <div id="bar" className="flex flex-row justify-between border-b-2 border-t-2 p-3">
-        <div>
-          <input
-            type="text"
-            placeholder="Search by name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          </div>
-          <div className="flex gap-2">
-          <div>
-            <button onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
-              Sort Order: {sortOrder.toUpperCase()}
-            </button>
-          </div>
-        <div>
-            <select
-              value={roomType}
-              onChange={(e) => setRoomType(e.target.value as 'room' | 'home' | '')}
-            >
-              <option value="">Category</option>
-              <option value="room">Room</option>
-              <option value="home">Home</option>
-            </select>
-        </div>
-        <div>
-            <button onClick={resetFilters} className="px-2 py-1 text-sm text-white bg-black hover:bg-white hover:text-black rounded">
-              Reset Filters
-            </button>
-        </div>
-        </div>
-      </div> */}
+      <div id="banner" className="w-full justify-center items-center pb-3">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-997566368472977053/original/2b023175-6872-4202-ace0-29bc06504385.jpeg?im_w=960" alt="Card" className="w-full lg:h-72 object-cover" />
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 my-4 items-center">
         {isLoading ? (
           Array.from({ length: 8 }).map((_, index) => <SkeletonLoader key={index} />)
         ) : (
-            filteredData.map(room => (
-              <div key={room._id} onClick={() => navigate(`/details/${room._id}`)} className="w-full cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-lg overflow-hidden rounded-sm">
-                <img src={room.images[0]} alt="card" className="w-full h-40 object-cover" />
-                <div className="flex flex-col p-4">
-                  <h2 className="text-xl font-bold mb-2">{room.name}</h2>
-                  <p className="text-gray-700">{room.state}, {room.district}</p>
-                  <p className="text-gray-700">₹ {room.rent} / night</p>
-                </div>
+            rooms.map(room => (
+            <div key={room._id} onClick={() => navigate(`/details/${room._id}`)} className="w-full cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-lg overflow-hidden rounded-sm">
+              <img src={room.images[0]} alt="card" className="w-full h-40 object-cover" />
+              <div className="flex flex-col p-4">
+                <h2 className="text-xl font-bold mb-2">{room.name}</h2>
+                <p className="text-gray-700">{room.state}, {room.district}</p>
+                <p className="text-gray-700">₹ {room.rent} / night</p>
               </div>
-            ))
+            </div>
+          ))
         )}
-        </div>
-        <div>
-          <div className="flex justify-center">
-          {!isLoading &&(
-            <button className="cursor-pointer transition-all bg-black text-white px-6 py-2 rounded-lg
-border-b-[4px]">
-              Show More
-            </button>
-          )}
-          </div>
-        </div>
+      </div>
+      {hasNextPage && !isLoading && (
+        <div ref={observerRef} className="h-10"></div>
+      )}
     </>
   );
 };
+
 export default HomePage;
