@@ -6,7 +6,7 @@ import { HostDash } from "../pages/userHost/HostDashboard";
 import { Messanger } from "../pages/userHost/Messenger/Messanger";
 import Wishlist from "../pages/user/wishlist/wishlist";
 import Bookings from "../pages/user/bookings/bookings";
-import SuccessOrFailure from "../pages/user/success or failure/paymentLast";
+import SuccessOrFailure from "../pages/user/success or failure/success";
 const UserRoutes = () => {
   return (
     <Routes>
