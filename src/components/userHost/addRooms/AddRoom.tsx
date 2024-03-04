@@ -4,6 +4,7 @@ import { BiReset } from "react-icons/bi";
 import Dropdown from '../../common/DropDown/Dropdown';
 import { toast } from "react-toastify";
 import { useMutation,useQuery} from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 // import StateDistrictDropdown from '../../common/DropDown/StateDistrictDropdown';
 import { useNavigate } from 'react-router-dom';
 import { addRoom } from '../../../api/userapi';
@@ -290,21 +291,26 @@ const AddRoom: React.FC = () => {
 
 
   return (
-    <div className="bg-gray-100 min-h-screen w-full">
-      <main className="container mx-auto py-8 flex flex-col items-center">
-        <div className="bg-white p-10  shadow-lg">
-          <h1 className="text-3xl font-bold mb-4">Add Your Property</h1>
+    <div className='flex flex-col lg:pt-3 w-full'>
+      <div className='font-thin'>
+        <Link to="/host">Your Listing</Link> / Describe your place
+      </div>
+      <div className='flex lg:mt-2'>
+        <p className="text-3xl font-semibold tracking-wide">Describe your Place</p>
+      </div>
+      <main className="container h-full flex flex-col items-center shadow-sm lg:mt-5">
+        <div className="bg-white p-10 w-3/4 border rounded-sm">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className='flex flex-row justify-between'>
               <div className="items-center">
-                <label htmlFor="name" className="block text-gray-800 w-1/4">
-                  Name
+                <label htmlFor="name" className="block text-gray-800 w-40">
+                  Place name
                 </label>
                 <input
                   type="text"
                   id="name"
                   name="name"
-                  className="w-3/4 border border-gray-300 p-2 rounded-lg"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Enter room name"
                 />
               </div>
@@ -316,7 +322,7 @@ const AddRoom: React.FC = () => {
                   type="text"
                   id="bedrooms"
                   name="bedrooms"
-                  className="w-3/4 border border-gray-300 p-2 rounded-lg appearance-none"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Enter number of bedrooms"
                 />
               </div>
@@ -330,7 +336,7 @@ const AddRoom: React.FC = () => {
                   type="number"
                   id="bathrooms"
                   name="bathrooms"
-                  className="w-3/4 border border-gray-300 p-2 rounded-lg appearance-none"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Enter number of bathrooms"
                 />
               </div>
@@ -342,7 +348,7 @@ const AddRoom: React.FC = () => {
                   type="number"
                   id="guests"
                   name="guests"
-                  className="w-3/4 border border-gray-300 p-2 rounded-lg appearance-none"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Enter number of guests"
                 />
               </div>
@@ -352,7 +358,7 @@ const AddRoom: React.FC = () => {
                 <label htmlFor="guests" className="block text-gray-800 w-30">
                   category
                 </label>
-                <Dropdown options={['room','home']} onSelect={handleCategorySelect} label="Category" />
+                <Dropdown options={['room', 'home']} onSelect={handleCategorySelect} label="Category" />
               </div>
             </div>
             <div className='flex-row justify-center gap-2'>
@@ -364,7 +370,7 @@ const AddRoom: React.FC = () => {
                   type="text"
                   id="subdesciption"
                   name="subdescription"
-                  className="w-3/4 border border-gray-300 p-2 rounded-lg"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Sub description"
                 />
               </div>
@@ -394,28 +400,28 @@ const AddRoom: React.FC = () => {
                   Amenities
                 </label>
                 <div className='flex flex-row gap-2'>
-                  <Dropdown options={['wifi', 'car parking',"locker",'camp fire']} onSelect={handleAmenitySelect} label="Amenities" />
+                  <Dropdown options={['wifi', 'car parking', "locker", 'camp fire']} onSelect={handleAmenitySelect} label="Amenities" />
                   <button type="button" onClick={handlePlusClick}>+</button>
                 </div>
               </div>
             </div>
             {showAmenityField && (
-            <div className='flex-col justify-center gap-2'>
-              <div className="items-center">
-                <label htmlFor="guests" className="block text-gray-800 w-30">
-                  Additional amenities
-                </label>
+              <div className='flex-col justify-center gap-2'>
+                <div className="items-center">
+                  <label htmlFor="guests" className="block text-gray-800 w-30">
+                    Additional amenities
+                  </label>
                   <div className='flex flex-row gap-2'>
                     <input
-                      className="w-3/4 border border-gray-300 p-2 rounded-lg"
+                      className="w-3/4 border bg-gray-50 border-gray-300 p-2 rounded-lg"
                       type="text"
                       value={newAmenity}
                       onChange={(e) => setNewAmenity(e.target.value)}
                     />
                     <button onClick={handleSaveClick}>Save</button>
                   </div>
+                </div>
               </div>
-            </div>
             )}
             <div className='flex-col justify-center gap-2'>
               <div className="items-center">
@@ -426,7 +432,7 @@ const AddRoom: React.FC = () => {
                   type="number"
                   id="rent"
                   name="rent"
-                  className="w-3/4 border border-gray-300 p-2 rounded-lg"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Room rent"
                 />
               </div>
@@ -439,7 +445,7 @@ const AddRoom: React.FC = () => {
                 id="description"
                 name="description"
                 rows={5}
-                className="w-3/4 border border-gray-300 p-2 rounded-lg"
+                className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Enter room description"
               ></textarea>
             </div>
@@ -500,15 +506,15 @@ const AddRoom: React.FC = () => {
                   <>
                     <div className='flex flex-row gap-5'>
                       <div className='flex flex-col'>
-                          <div>
-                            State: {locationData?.features[0].properties?.state}
-                          </div>
-                          <div>
-                            District: {locationData?.features[0].properties?.state_district}
-                          </div>
-                          <div>
-                            Place: {locationData?.features[0].properties?.county}
-                          </div>
+                        <div>
+                          State: {locationData?.features[0].properties?.state}
+                        </div>
+                        <div>
+                          District: {locationData?.features[0].properties?.state_district}
+                        </div>
+                        <div>
+                          Place: {locationData?.features[0].properties?.county}
+                        </div>
                       </div>
                       <div>
                         <BiReset onClick={handleReset} />
@@ -530,12 +536,9 @@ const AddRoom: React.FC = () => {
           </form>
         </div>
       </main>
-      <footer className="bg-blue-500 p-4 text-white text-center">
-        <p>&copy; 2023 SojournNest. All rights reserved.</p>
-      </footer>
       {isLoading && <Loader />}
       {isPending && <Loader />}
-    </div>
+      </div>
   );
 };
 export default AddRoom;
