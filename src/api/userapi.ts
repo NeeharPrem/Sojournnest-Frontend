@@ -153,6 +153,36 @@ export const addRoom = async (roomData: FormData) => {
   }
 };
 
+export const getAmenity = async () => {
+  try {
+    const response = await Api.get(userEndpoints.getAmenities);
+    return response?.data?.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const getCategory = async () => {
+  try {
+    const response = await Api.get(userEndpoints.getCategory);
+    return response?.data?.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
 export const roomData = async (id: string| undefined) => {
   try {
     const response = await Api.get(`${userEndpoints.roomData}/${id}`);
@@ -265,9 +295,9 @@ export const roomDataUpdate = async (id: string, updateData: FormData) => {
   }
 };
 
-export const allListings = async (user:Object) => {
+export const allListings = async (page:number) => {
   try {
-    const response = await Api.get(userEndpoints.homeListings,user);
+    const response = await Api.get(`${userEndpoints.homeListings}?page=${page}`);
     return response.data;
   } catch (error) {
     if (error && (error as AxiosError).isAxiosError) {
