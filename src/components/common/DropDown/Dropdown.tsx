@@ -27,7 +27,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, onSelect, label }) => {
       </label>
       <button
         id="dropdown"
-        className="flex items-center justify-between w-48 px-4 py-2 text-lg font-medium text-gray-800 bg-white border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300"
+        className="flex items-center justify-between w-48 px-4 py-2 text-lg font-medium text-gray-800 bg-gray-50 border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300"
         onClick={toggleDropdown}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
