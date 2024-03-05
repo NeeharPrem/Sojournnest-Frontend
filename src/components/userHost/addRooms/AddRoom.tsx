@@ -7,7 +7,9 @@ import { useMutation,useQuery} from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 // import StateDistrictDropdown from '../../common/DropDown/StateDistrictDropdown';
 import { useNavigate } from 'react-router-dom';
-import { addRoom } from '../../../api/userapi';
+import { addRoom} from '../../../api/userapi';
+import { getAmenity} from '../../../api/userapi';
+import { getCategory } from '../../../api/userapi';
 import Loader from '../../common/Loader';
 
 interface Location {
@@ -38,6 +40,31 @@ const AddRoom: React.FC = () => {
     queryFn: () => fetch(url).then((response) => response.json()),
     enabled: !!selectedLocation, 
   });
+
+  const {
+    data,
+    isLoading:amenityLoad
+  } = useQuery({
+    queryKey: ["amnyData"],
+    queryFn: getAmenity,
+  });
+  
+  let aData
+  if(data){
+    aData = data[0].amenities
+  }
+
+  const {
+    data: categoryData,
+    isLoading:categoryLoad
+  } = useQuery({
+    queryKey: ["catData"],
+    queryFn: getCategory,
+  });
+  let cData
+  if(categoryData){
+    cData = categoryData[0].category
+  } 
 
   const handlePlusClick = () => {
     setShowAmenityField(!showAmenityField);
@@ -289,6 +316,15 @@ const AddRoom: React.FC = () => {
     },
   });
 
+  const handleRemoveLastAmenity = (event: any) => {
+    event.preventDefault();
+    if (amenities.length > 0) {
+      const newAmenities = [...amenities];
+      newAmenities.pop();
+      setAmenities(newAmenities);
+    }
+  };
+
 
   return (
     <div className='flex flex-col lg:pt-3 w-full'>
@@ -358,7 +394,7 @@ const AddRoom: React.FC = () => {
                 <label htmlFor="guests" className="block text-gray-800 w-30">
                   category
                 </label>
-                <Dropdown options={['room', 'home']} onSelect={handleCategorySelect} label="Category" />
+                <Dropdown options={cData} onSelect={handleCategorySelect} label="Category" />
               </div>
             </div>
             <div className='flex-row justify-center gap-2'>
@@ -381,16 +417,16 @@ const AddRoom: React.FC = () => {
             <div className='flex-col justify-center gap-2'>
               <div id="amenities" className='items-center'>
                 {amenities.length > 0 && (
-                  <>
+                  <><>
                     <div>
                       <label htmlFor="guests" className="block text-gray-800 w-30">
-                        Selected amenities
+                        Amenities
                       </label>
                     </div>
                     <div>
                       {amenities.join(', ')}
                     </div>
-                  </>
+                  </><button onClick={handleRemoveLastAmenity}>Remove Amenity</button></>
                 )}
               </div>
             </div>
@@ -400,7 +436,7 @@ const AddRoom: React.FC = () => {
                   Amenities
                 </label>
                 <div className='flex flex-row gap-2'>
-                  <Dropdown options={['wifi', 'car parking', "locker", 'camp fire']} onSelect={handleAmenitySelect} label="Amenities" />
+                  <Dropdown options={aData} onSelect={handleAmenitySelect} label="Amenities" />
                   <button type="button" onClick={handlePlusClick}>+</button>
                 </div>
               </div>
@@ -538,6 +574,8 @@ const AddRoom: React.FC = () => {
       </main>
       {isLoading && <Loader />}
       {isPending && <Loader />}
+      {amenityLoad && <Loader/>}
+      {categoryLoad && <Loader/>}
       </div>
   );
 };
