@@ -11,6 +11,8 @@ const userEndpoints = {
   usergetChat:'/chat',
   getListings: "/users/host/listings",
   addRoom: "/users/host/listings",
+  getAmenities:'/users/amenities',
+  getCategory:'/users/category',
   roomData:"/users/host/listings",
   unlist: "/users/host/listings",
   roomDataUpdate:"/users/host/listings",
