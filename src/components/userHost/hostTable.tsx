@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { unlist } from "../../api/userapi";
 import Loader from "../common/Loader";
 import BorderColorSharpIcon from '@mui/icons-material/BorderColorSharp';
+import { FaCalendarAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 interface Room {
@@ -102,6 +103,9 @@ const ListingTable: React.FC<MyComponentProps> = ({
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Edit
                   </th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -168,6 +172,11 @@ const ListingTable: React.FC<MyComponentProps> = ({
                           <BorderColorSharpIcon />
                         </Link>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center item-center">
+                      <Link to='/managedate'>
+                        <FaCalendarAlt />
+                        </Link>
                     </td>
                   </tr>
                 ))}
