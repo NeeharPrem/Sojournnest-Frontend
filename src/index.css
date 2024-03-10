@@ -5,3 +5,8 @@
 .calendar-tile-current-date {
   background-color: #facc15 !important;
 }
+
+.calendar-tile-selected-range {
+    background-color: red;
+    color: black;
+}
