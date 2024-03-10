@@ -432,3 +432,44 @@ export const cancelBooking = async (Id:string) => {
     }
   }
 }
+
+export const blockDates = async ({ id, data }: { id: string | undefined; data: object }) => {
+  try {
+    const response = await Api.put(`${userEndpoints.blockDates}/${id}`,data)
+    return response?.data
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
+
+export const blockedDates = async ({ queryKey }: { queryKey: [string, string] }) => {
+  const [, id] = queryKey; 
+  try {
+    const response = await Api.get(`${userEndpoints.blockDates}/${id}`)
+    console.log(response,'ff')
+    return response
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
+
+export const removeDates = async ({ id, data }: { id: string | undefined; data: object }) => {
+  try {
+    const response = await Api.patch(`${userEndpoints.blockDates}/${id}`,data)
+    return response?.data
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
