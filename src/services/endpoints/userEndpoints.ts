@@ -29,7 +29,10 @@ const userEndpoints = {
   getBookings: '/users/bookings',
   cancelBooking:'/users/bookings',
   checkDateAvailability:'/users/bookings/check-availability',
-  payment:'users/bookings'
+  payment:'/users/bookings',
+  blockDates:'/users/host/managedate',
+  blockedDates:'/users/host/managedate',
+  removeDates:'/users/host/managedate'
 };
 
 export default userEndpoints;
