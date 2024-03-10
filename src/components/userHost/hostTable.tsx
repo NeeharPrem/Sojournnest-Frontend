@@ -6,6 +6,7 @@ import Loader from "../common/Loader";
 import BorderColorSharpIcon from '@mui/icons-material/BorderColorSharp';
 import { FaCalendarAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface Room {
   _id: string;
@@ -41,6 +42,7 @@ const ListingTable: React.FC<MyComponentProps> = ({
   //         [roomId]: isChecked,
   //     }));
   // };
+ const navigate= useNavigate()
 
   const { mutate: unlistData } = useMutation({
     mutationFn: unlist,
@@ -174,9 +176,7 @@ const ListingTable: React.FC<MyComponentProps> = ({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center item-center">
-                      <Link to='/managedate'>
-                        <FaCalendarAlt />
-                        </Link>
+                        <FaCalendarAlt onClick={() => navigate(`/managedate/${room._id}`)} />
                     </td>
                   </tr>
                 ))}
