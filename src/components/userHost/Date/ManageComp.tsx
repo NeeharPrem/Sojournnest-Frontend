@@ -129,8 +129,7 @@ const ManageComp = () => {
                       <Calendar
                           tileDisabled={({ date, view }) => {
                               if (view !== 'month') return false;
-                              if (date.getMonth() !== viewedMonth || date.getFullYear() !== viewedYear) return false; // Only disable dates in the currently viewed month
-
+                              if (date.getMonth() !== viewedMonth || date.getFullYear() !== viewedYear) return false;
                               return dateData?.data?.some(({ startDate, endDate }: DateRange) => {
                                   const start = new Date(startDate);
                                   const end = new Date(endDate);
