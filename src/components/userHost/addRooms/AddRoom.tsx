@@ -461,7 +461,7 @@ const AddRoom: React.FC = () => {
             )}
             <div className='flex-col justify-center gap-2'>
               <div className="items-center">
-                <label htmlFor="guests" className="block text-gray-800 w-30">
+                <label htmlFor="guests" className="block text-gray-800 font-medium  w-30">
                   Room rent
                 </label>
                 <input
@@ -474,7 +474,7 @@ const AddRoom: React.FC = () => {
               </div>
             </div>
             <div className="items-center">
-              <label htmlFor="description" className="block text-gray-800 w-1/4">
+              <label htmlFor="description" className="block text-gray-800 font-medium w-1/4">
                 Description
               </label>
               <textarea
@@ -485,19 +485,9 @@ const AddRoom: React.FC = () => {
                 placeholder="Enter room description"
               ></textarea>
             </div>
-            <div className="items-center">
-              <label htmlFor="image" className="block text-gray-800 w-30">
-                Room Images (choose 5 images below 10MB)
-              </label>
-              <input
-                type="file"
-                id="images"
-                name="images"
-                accept="image/*"
-                className="w-3/4 border border-gray-300 p-2 rounded-lg"
-                multiple
-                onChange={handleImageUpload}
-              />
+            <div className="grid w-full max-w-xs items-center gap-1.5">
+              <label className="text-sm text-black font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Room Images (choose 5 images below 10MB)</label>
+              <input id="images" name='images' accept='image/*' multiple onChange={handleImageUpload} type="file" className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-gray-400 file:border-0 file:bg-transparent file:text-gray-600 file:text-sm file:font-medium"/>
             </div>
             {roomImages.length > 0 && (
               <div className="flex items-center space-x-6">
