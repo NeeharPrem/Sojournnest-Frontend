@@ -1,12 +1,16 @@
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 import { JSXElementConstructor, ReactElement, ReactNode, ReactPortal, useState,useEffect} from "react";
-import { roomDetail, addtoWishlist, getWishlist, removeWishlist, checkDateAvailability,payment} from "../../api/userapi";
+import { roomDetail, addtoWishlist, getWishlist, removeWishlist, checkDateAvailability, payment} from "../../api/userapi";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery,useMutation} from "@tanstack/react-query";
 import Loader from '../common/Loader';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
+interface DateRange {
+    startDate: string;
+    endDate: string;
+}
 
 const DetailsPage=() => {
     const [wishlist,setWishlist]=useState(false)
@@ -95,7 +99,7 @@ const DetailsPage=() => {
         return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
     };
 
-    const handleDateChange = (value: Date) => {
+    const handleDateChange = async (value: Date) => {
         const formattedValue = formatDate(value);
         if (isCheckInSelected) {
             setCheckInDate(formattedValue);
@@ -103,11 +107,18 @@ const DetailsPage=() => {
             const nextDay = new Date(value);
             nextDay.setDate(nextDay.getDate() + 1);
             setMinCheckoutDate(nextDay);
+            if (checkOutDate) {
+                setCheckOutDate(""); 
+                setIsAvailable(false);
+            }
         } else {
             setCheckOutDate(formattedValue);
-            setIsCheckInSelected(true);
+            if (checkInDate && formattedValue) {
+                await checkAvailability(checkInDate, formattedValue);
+            }
         }
     };
+
 
     const resetDates = () => {
         setCheckInDate(""); 
@@ -117,13 +128,13 @@ const DetailsPage=() => {
         setIsAvailable(false)
     };
 
-    const checkAvailability = async () => {
-    
-        const Data={
+    const checkAvailability = async (checkIn: string, checkOut: string) => {
+        const Data = {
             roomId,
-            checkInDate,
-            checkOutDate
-        }
+            checkInDate: checkIn,
+            checkOutDate: checkOut
+        };
+        console.log(Data,'data')
         const availability= await checkDateAvailability(Data);
         if(availability?.status==200){
             toast.success(availability.data.message)
@@ -137,7 +148,7 @@ const DetailsPage=() => {
         if (adultCount + kidCount < Data?.guests) {
             setAdultCount(prevCount => prevCount + 1);
         } else {
-            toast.warn("Max guests limit reached");
+            toast.warning("Max guests limit reached");
         }
     };
 
@@ -151,7 +162,7 @@ const DetailsPage=() => {
         if (adultCount + kidCount < Data?.guests) {
             setKidCount(prevCount => prevCount + 1);
         } else {
-            toast.warn("Max guests limit reached");
+            toast.warning("Max guests limit reached");
         }
     };
 
@@ -172,7 +183,6 @@ const DetailsPage=() => {
         }
         paymentSession(bookingData)
     }
-
 
     return !isLoading ?(
          <>
@@ -254,46 +264,63 @@ const DetailsPage=() => {
                                     return 'calendar-tile-current-date';
                                 }
                             }}
+                            tileDisabled={({ date, view }) => {
+                                if (view !== 'month') return false;
+                                return Data?.blockedDates?.some(({ startDate, endDate }: DateRange) => {
+                                    const start = new Date(startDate);
+                                    const end = new Date(endDate);
+                                    start.setHours(0, 0, 0, 0);
+                                    end.setHours(23, 59, 59, 999);
+                                    return date >= start && date <= end;
+                                });
+                            }}
                         />
                     </div>
                     <div>
                         <p>check in Date: {checkInDate}</p>
                         <p>checout Date: {checkOutDate}</p>
-                        <button onClick={resetDates} className="mt-2 bg-red-500 text-white font-bold py-1 px-4 rounded-full">
-                            Reset Dates
-                        </button>
-                        {checkInDate && checkOutDate && (
-                            <div className="flex justify-center mt-4">
-                                <button
-                                    onClick={checkAvailability}
-                                    className="bg-black text-white font-bold py-2 px-4 rounded-full"
-                                >
-                                    Check Availability
-                                </button>
-                            </div>
-                        )}
+                        {checkInDate && checkOutDate && 
+                            <button onClick={resetDates} className="mt-2 bg-red-500 text-white font-bold py-1 px-4 rounded">
+                                Reset Dates
+                            </button>
+                        }
                         {isAvailable && (
                             <>
-                                <div className="flex justify-between items-center mt-4">
-                                    <span>Adults:</span>
-                                    <button onClick={decrementAdultCount} className="bg-red-500 text-white font-bold py-1 px-4 rounded-full">-</button>
-                                    <span>{adultCount}</span>
-                                    {adultCount < Data?.guests && (
-                                        <button onClick={incrementAdultCount} className="bg-green-500 text-white font-bold py-1 px-4 rounded-full">+</button>
-                                    )}
-                                </div>
-                                <div className="flex justify-between items-center mt-2">
-                                    <span>Kids:</span>
-                                    <button onClick={decrementKidCount} className="bg-red-500 text-white font-bold py-1 px-4 rounded-full">-</button>
-                                    <span>{kidCount}</span>
-                                    <button onClick={incrementKidCount} className="bg-green-500 text-white font-bold py-1 px-4 rounded-full">+</button>
+                                <div className='flex flex-row justify-between lg:mt-2'>
+                                    <div className='flex flex-col justify-between'>
+                                        <span>Adults:</span>
+                                        <span>Kids:</span>
+                                    </div>
+                                    <div className='flex flex-col lg:gap-2'>
+                                        <div className='flex flex-row justify-evenly gap-2 items-center'>
+                                            <button onClick={decrementAdultCount} className="text-black font-bold border-2 py-1 px-4 rounded">-</button>
+                                            <p>{adultCount}</p>
+                                            <button
+                                                onClick={() => {
+                                                    if (adultCount + kidCount < Data?.guests) {
+                                                        incrementAdultCount();
+                                                    }
+                                                }}
+                                                disabled={adultCount + kidCount >= Data?.guests}
+                                                className="text-black font-bold border-2 py-1 px-4 rounded">+</button>
+                                        </div>
+                                        <div className='flex flex-row justify-evenly gap-2'>
+                                            <button onClick={decrementKidCount} className="text-black font-bold border-2 py-1 px-4 rounded">-</button>
+                                            <p>{kidCount}</p>
+                                            <button
+                                                onClick={() => {
+                                                    if (adultCount + kidCount < Data?.guests) {
+                                                        incrementKidCount();
+                                                    }
+                                                }}
+                                                disabled={adultCount + kidCount >= Data?.guests}
+                                                className="text-black font-bold border-2 py-1 px-4 rounded">+</button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="flex justify-center mt-4">
-                                    <button
-                                        onClick={handleCheckout}
-                                        className="bg-green-500 text-white font-bold py-2 px-4 rounded-full"
-                                    >
-                                        Proceed to Checkout
+                                    <button onClick={handleCheckout} className="w-[150px] bg-black h-[50px] my-3 flex items-center justify-center rounded-xl cursor-pointer relative overflow-hidden transition-all duration-500 ease-in-out shadow-md hover:scale-105 hover:shadow-lg before:absolute before:top-0 before:-left-full before:w-full before:h-full before:bg-gradient-to-r before:from-[#009b49] before:to-[rgb(105,184,141)] before:transition-all before:duration-500 before:ease-in-out before:z-[-1] before:rounded-xl hover:before:left-0 text-[#fff]">
+                                        Proceed
                                     </button>
                                 </div>
                             </>
