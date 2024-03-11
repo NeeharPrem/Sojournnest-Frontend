@@ -10,6 +10,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { Toaster } from 'sonner';
 const Google_Client_Id = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <ThemeProvider>
           <QueryClientProvider client={queryClient}>
             <App />
+            <Toaster position="top-center" richColors />
           </QueryClientProvider>
           <ToastContainer />
         </ThemeProvider>
