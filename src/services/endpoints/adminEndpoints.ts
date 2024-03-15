@@ -3,6 +3,7 @@ const adminEndpoints = {
   logout: "/auth/admin/logout",
   allUsers: "/admins/users",
   blockUser: "/admins/users",
+  approveUser:'admins/users',
   allListings: "/admins/listings",
   approveListing: "/admins/listings",
   blockListing: "/admins/listings",
