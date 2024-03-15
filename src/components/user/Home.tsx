@@ -28,28 +28,16 @@ const HomePage = () => {
   });
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        const [entry] = entries;
-        if (entry.isIntersecting && hasNextPage && !isError) {
-          fetchNextPage();
-        }
-      },
-      {
-        rootMargin: '100px',
-      }
-    );
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop !==
+        document.documentElement.offsetHeight || !hasNextPage || isError
+      ) return;
 
-    const currentElement = observerRef.current;
-    if (currentElement) {
-      observer.observe(currentElement);
-    }
-
-    return () => {
-      if (currentElement) {
-        observer.unobserve(currentElement);
-      }
+      fetchNextPage();
     };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [hasNextPage, isError, fetchNextPage]);
 
   const rooms = data?.pages.flatMap(page => page.data) || [];
