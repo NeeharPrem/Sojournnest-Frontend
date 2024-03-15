@@ -4,6 +4,7 @@ import { getBookings,cancelBooking} from "../../../api/userapi";
 import { Link } from "react-router-dom";
 import {useState } from "react";
 import Cancelled from "./cancelled";
+import { toast } from "sonner";
 
 interface BookingItem {
     _id: string;
@@ -39,8 +40,10 @@ const Booking = () => {
      const { mutate: cancelledData } = useMutation({
         mutationFn: cancelBooking,
         onSuccess: (response) => {
-            console.log(response)
-            refetch()
+            if(response?.status===200){
+                toast.success(response.data.message)
+                refetch()
+            }
         },
     });
 
