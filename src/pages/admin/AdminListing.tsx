@@ -1,25 +1,20 @@
-import UserTable from "../../components/admin/UserTable";
-import AdminSidebar from "../../components/admin/AdminSidebar";
+import ListingTable from "../../components/admin/ListingTable";
 import { useQuery } from "@tanstack/react-query";
 import { allListings } from "../../api/adminapi";
+import AdminUiBase from "../../components/common/Admin/AdminUiBase";
 
 export const AdminListings = () => {
   const { data: Data, refetch } = useQuery({
-    queryKey: ["userData"],
+    queryKey: ["RoomData"],
     queryFn: allListings,
   });
   return (
-    <div className="flex flex-row bg-yellow-50">
-      <div>
-        <AdminSidebar />
-      </div>
-      <div className="w-full mt-10">
-        <UserTable
-          refetch={refetch}
-          info={Data?.data.info}
-          userInfos={Data?.data.data || []}
-        />
-      </div>
-    </div>
+     <AdminUiBase>
+      <ListingTable
+      refetch={refetch}
+        info={Data?.data.info}
+      userInfos={Data?.data.data || []}
+      />
+    </AdminUiBase>
   );
 };
