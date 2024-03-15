@@ -113,6 +113,16 @@ export const updateProfile = async ({ id, userData }: UpdateProfileArgs): Promis
   }
 };
 
+export const uploadId = async ({ id, userData }: UpdateProfileArgs): Promise<AxiosResponse<any, any>> => {
+  try {
+    const response = await Api.put(`${userEndpoints.uploadId}/${id}`,userData);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export const getListings = async () => {
   try {
     const response = await Api.get(userEndpoints.getListings);
@@ -420,6 +430,101 @@ export const getBookings = async () => {
   }
 }
 
+export const cancelledBookings = async () => {
+  try {
+    const response = await Api.get(userEndpoints.canceledBookings)
+    return response
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
+
+export const upBookings = async () => {
+  try {
+    const response = await Api.get(`${userEndpoints.upBookings}?status=${'upcoming'}`)
+    return response
+  } catch (error:any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
+
+export const canBookings = async () => {
+  try {
+    const response = await Api.get(`${userEndpoints.canBookings}?status=${'cancelled'}`)
+    return response
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
+
+export const compBookings = async () => {
+  try {
+    const response = await Api.get(`${userEndpoints.canBookings}?status=${'completed'}`)
+    return response
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
+
+export const allBookings = async () => {
+  try {
+    const response = await Api.get(`${userEndpoints.canBookings}?status=${'all'}`)
+    return response
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
+
+export const hsotcancelBooking = async (Id: string) => {
+  try {
+    const response = await Api.patch(`${userEndpoints.hsotcancelBooking}/${Id}`)
+    return response
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+    console.log(error)
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
+
+export const hostconfirmBooking = async (Id: string,data:object) => {
+  try {
+    const response = await Api.patch(`${userEndpoints.hostconfirmBooking}/${Id}`,data)
+    return response
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error)
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+}
+
 export const cancelBooking = async (Id:string) => {
   try {
     const response = await Api.patch(`${userEndpoints.cancelBooking}/${Id}`)
@@ -450,7 +555,6 @@ export const blockedDates = async ({ queryKey }: { queryKey: [string, string] })
   const [, id] = queryKey; 
   try {
     const response = await Api.get(`${userEndpoints.blockDates}/${id}`)
-    console.log(response,'ff')
     return response
   } catch (error) {
     if (error && (error as AxiosError).isAxiosError) {
