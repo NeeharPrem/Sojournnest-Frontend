@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { blockUser } from "../../api/adminapi";
-import { approveListing } from "../../api/adminapi";
-import { blockListing } from "../../api/adminapi";
+import { approveUser } from "../../api/adminapi";
 import { useState } from "react";
+import ApproveModal from "../common/modal/approveModal";
 import ConfirmationModal from "../common/modal/confirmationModal";
-import { Pagination } from "@mui/material";
+import { toast } from "sonner";
 
 interface UserTableProps {
   userInfos: any[];
@@ -12,8 +12,9 @@ interface UserTableProps {
   info: string;
 }
 
-const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch, info }) => {
+const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
   const [selectedUserId, setSelectedUserId] = useState("");
+  const [selectedUser, setSelectedUser] = useState({ id: "", verifyId: "" });
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
@@ -26,19 +27,12 @@ const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch, info }) => {
       }
     },
   });
-  const { mutate: blockList } = useMutation({
-    mutationFn: blockListing,
-    onSuccess: (response) => {
-      if (response) {
-        refetch();
-      }
-    },
-  });
 
-  const { mutate: approveList } = useMutation({
-    mutationFn: approveListing,
+  const { mutate: approve } = useMutation({
+    mutationFn: approveUser,
     onSuccess: (response) => {
-      if (response) {
+      if (response?.status===200) {
+        toast.success('User approved')
         refetch();
       }
     },
@@ -49,14 +43,8 @@ const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch, info }) => {
     setIsConfirmationModalOpen(false);
   };
 
-  const blockConfirmation = () => {
-    blockList(selectedUserId);
-    setIsConfirmationModalOpen(false);
-  };
-
   const approveConfirmation = () => {
-    console.log("yup");
-    approveList(selectedUserId);
+    approve(selectedUserId);
     setIsApproveModalOpen(false);
   };
 
@@ -73,56 +61,71 @@ const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch, info }) => {
     setIsConfirmationModalOpen(true);
   };
 
-  const openApproveModal = (userId: string) => {
-    setSelectedUserId(userId);
+  const openApproveModal = (userId: string, verifyId: string) => {
+    setSelectedUserId(userId)
+    setSelectedUser({ id: userId, verifyId });
     setIsApproveModalOpen(true);
   };
+
 
   return (
     <div className="justify-center flex-col">
       <>
       <div className="flex justify-center">
-          <table className="w-2/3 mt-8 border shadow rounded-lg bg-white">
-            <thead className="bg-gray-200">
-              {info === "listings" ? (
-                <tr>
-                  <th className="py-2 px-4">No</th>
-                  <th className="py-2 px-4">Location Name</th>
-                  <th className="py-2 px-4">Hosted Person</th>
-                  <th className="py-2 px-4">Approved status</th>
-                  <th className="py-2 px-4">Actions</th>
-                </tr>
-              ) : (
-                <tr>
-                  <th className="py-2 px-4">No</th>
-                  <th className="py-2 px-4">Name</th>
-                  <th className="py-2 px-4">Email</th>
-                  <th className="py-2 px-4">Actions</th>
-                </tr>
-              )}
-            </thead>
+        <table className="min-w-full divide-y divide-gray-200 border-2 rounded-md">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                No
+              </th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Email
+              </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Approve status
+              </th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Action
+              </th>
+            </tr>
+          </thead>
             <tbody>
-              {info === "listings"
-                ? userInfos.map((data, index) => (
-                  <tr key={index} className="border-b">
-                    <td className="py-2 px-4 text-center">{index + 1}</td>
-                    <td className="py-2 px-4 text-center">{data.name}</td>
-                    <td className="py-2 px-4 text-center">
-                      {data?.userId?.fname} {data?.userId?.lname}
-                    </td>
-                    <td className="py-4 px-4 text-center">
-                      {data.is_approved ? (
-                        <h3 className="text-green-600">Approved</h3>
-                      ) : (
+              {userInfos.map((data,index) =>
+                <tr key={index} className="border-b">
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <div className="text-sm text-gray-900">
+                      {index+1}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <div className="text-sm text-gray-900">
+                      {data.fname} {data.lname}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <div className="text-sm text-gray-900">
+                      {data.email}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <div className="text-sm text-gray-900">
+                      {!data?.is_approved && data?.verifyId ? (
                         <button
-                          onClick={() => openApproveModal(data._id)}
+                          onClick={() => openApproveModal(data._id, data.verifyId)}
                           className="bg-green-900 text-white py-1 px-2 rounded-lg"
                         >
                           Approve
                         </button>
+                      ) : (
+                        <h3 className="text-green-600">Approved</h3>
                       )}
-                    </td>
-                    <td className="py-2 px-4 text-center">
+                      </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <div className="text-sm text-gray-900">
                       {data.is_blocked ? (
                         <button
                           onClick={() => openConfirmationModal(data._id)}
@@ -138,55 +141,22 @@ const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch, info }) => {
                           Block
                         </button>
                       )}
-                    </td>
-                  </tr>
-                ))
-                : userInfos.map((user, index) => (
-                  <tr key={index} className="border-b">
-                    <td className="py-2 px-4 text-center">{index + 1}</td>
-                    <td className="py-2 px-4 text-center">
-                      {user.fname} {user.lname}
-                    </td>
-                    <td className="py-2 px-4 text-center">{user.email}</td>
-                    <td className="py-2 px-4 text-center">
-                      {user.is_blocked ? (
-                        <button
-                          onClick={() => openConfirmationModal(user._id)}
-                          className="bg-green-600 text-white py-1 px-2 rounded-lg"
-                        >
-                          Unblock
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => openConfirmationModal(user._id)}
-                          className="bg-red-500 text-white py-1 px-2 rounded-lg"
-                        >
-                          Block
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
-          </table>
+        </table>
           {isApproveModalOpen && (
-            <ConfirmationModal
-              message={`Are you sure you want to approve '${userInfos.find((listing) => listing._id === selectedUserId)?.name}' ?`}
+            <ApproveModal
+              message={`${selectedUser.verifyId}`}
               onConfirm={approveConfirmation}
               onCancel={closeApproveModal}
             />
           )}
           <>
-            {info === "listings"
-              ? isConfirmationModalOpen && (
-                <ConfirmationModal
-                  message={`Are you sure you want to ${userInfos.find((listing) => listing._id === selectedUserId)?.is_blocked ? "unblock" : "block"} this listing?`}
-                  onConfirm={blockConfirmation}
-                  onCancel={closeConfirmationModal}
-                />
-              )
-              : isConfirmationModalOpen && (
-                <ConfirmationModal
+            {isConfirmationModalOpen && (
+              <ConfirmationModal
                   message={`Are you sure you want to ${userInfos.find((user) => user._id === selectedUserId)?.is_blocked ? "unblock" : "block"} this user?`}
                   onConfirm={handleConfirmation}
                   onCancel={closeConfirmationModal}
@@ -194,9 +164,6 @@ const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch, info }) => {
               )}
           </>
       </div>
-      {/* <div className="flex justify-center">
-          <Pagination count={5} variant="outlined" shape="rounded"/>
-      </div> */}
       </>
     </div>
   );
