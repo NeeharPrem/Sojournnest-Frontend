@@ -81,6 +81,20 @@ export const approveListing = async (id: string) => {
   }
 };
 
+export const approveUser = async (id: string) => {
+  try {
+    const response = await Api.patch(`${adminEndpoints.approveUser}/${id}`);
+    console.log(response,'res')
+    return response;
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+};
+
 export const blockListing = async (id: string) => {
   try {
     const response = await Api.patch(`${adminEndpoints.blockListing}/${id}`);
