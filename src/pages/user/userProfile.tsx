@@ -11,6 +11,8 @@ interface UserProfile {
   lname: string,
   profiePic:string,
   isgoogle:boolean
+  is_approved:boolean;
+  verifyId:string
 }
 
 const UserProfile = () => {
@@ -31,7 +33,9 @@ const UserProfile = () => {
     mobile: userData?.data?.mobile || "",
     profilePic: userData?.data?.profilePic,
     id:userData?.data?._id,
-    isgoogle:userData?.data?.is_google
+    isgoogle:userData?.data?.is_google,
+    is_approved:userData?.data?.is_approved,
+    verifyId:userData?.data?.verifyId
   };
 
   return (
