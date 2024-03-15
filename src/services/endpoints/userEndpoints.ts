@@ -7,6 +7,7 @@ const userEndpoints = {
   profile: "/users",
   getUser:'/users',
   updateProfile: "/users",
+  uploadId:'/users',
   roomDetail:'/users/listings',
   usergetChat:'/chat',
   getListings: "/users/host/listings",
@@ -27,12 +28,17 @@ const userEndpoints = {
   addMessage:'/users/host/chat/messages',
   getMessage:'/users/host/chat/messages',
   getBookings: '/users/bookings',
+  canceledBookings: '/users/bookings/cancelled',
   cancelBooking:'/users/bookings',
   checkDateAvailability:'/users/bookings/check-availability',
   payment:'/users/bookings',
   blockDates:'/users/host/managedate',
   blockedDates:'/users/host/managedate',
-  removeDates:'/users/host/managedate'
+  removeDates:'/users/host/managedate',
+  upBookings:'/users/host/bookings',
+  canBookings:'users/host/bookings',
+  hsotcancelBooking:'/users/host/bookings',
+  hostconfirmBooking:'users/host/bookigs'
 };
 
 export default userEndpoints;
