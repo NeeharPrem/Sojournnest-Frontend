@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Loader from "../common/Loader";
-import { updateProfile } from "../../api/userapi";
+import { updateProfile,uploadId} from "../../api/userapi";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
@@ -11,7 +11,9 @@ interface ProfileBody {
     email: string;
     mobile: string;
     id:string;
-    isgoogle:boolean;
+    isgoogle: boolean; 
+    is_approved: boolean;
+    verifyId: string
   };
   isLoading: boolean;
   refetch:any
@@ -30,6 +32,7 @@ const ProfileBody: React.FC<ProfileBody> = ({
   const [email, setEmail] = useState(userInfo.email);
   const [mobile, setMobile] = useState(userInfo.mobile);
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
+  const [selectedId, setSelectedId] = useState<File | null>(null);
   const [oldpass, setOldPass] = useState("");
   const [newpass, setNewPass] = useState("");
 
@@ -120,6 +123,14 @@ const ProfileBody: React.FC<ProfileBody> = ({
     }
   };
 
+  const handleIdChange = (files: FileList | null) => {
+    if (files && files.length > 0) {
+      setSelectedId(files[0]);
+    } else {
+      setSelectedId (null);
+    }
+  };
+
   const handleAvatarSaveClick = async () => {
     try {
       if (selectedAvatar) {
@@ -133,10 +144,31 @@ const ProfileBody: React.FC<ProfileBody> = ({
     }
   };
 
+  const handleIdupload = async () => {
+    try {
+      if (selectedId) {
+        const formData = new FormData();
+        formData.append("verifyId", selectedId);
+        updateId({ id: userInfo.id, userData: formData });
+        setSelectedId(null);
+      }
+    } catch (error) {
+      console.error("Error updating avatar:", error);
+    }
+  };
+
   const { mutate: update } = useMutation({
     mutationFn: updateProfile,
     onSuccess: (response) => {
       toast.success("Profile Updated")
+      if (response) refetch();
+    },
+  });
+
+  const { mutate: updateId } = useMutation({
+    mutationFn: uploadId,
+    onSuccess: (response) => {
+      toast.success("Id uploaded")
       if (response) refetch();
     },
   });
@@ -316,6 +348,32 @@ const ProfileBody: React.FC<ProfileBody> = ({
                 Save
               </button>
             </div>
+           {!userInfo.is_approved && userInfo.verifyId === "" && (
+ <div className="border-b p-5 flex items-center justify-between">
+    <div className="flex flex-col">
+      <div className="font-bold text-lg">Upload verification Id</div>
+      <div className="pt-2">
+        <input
+          type="file"
+          className="py-2 px-2 text-white rounded-full"
+          accept="image/*"
+          onChange={(e) => handleIdChange(e.target.files)}
+        />
+      </div>
+    </div>
+    {selectedId && (
+      <div className="ml-2">
+        <span className="font-medium">{selectedId.name}</span>
+      </div>
+    )}
+    <button
+      className="font-medium text-black px-3 py-1 underline"
+      onClick={handleIdupload}
+    >
+      upload
+    </button>
+ </div>
+)}
           </div>
         </div>
       </div>
