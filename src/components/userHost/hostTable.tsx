@@ -34,14 +34,6 @@ const ListingTable: React.FC<MyComponentProps> = ({
 }) => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
-  // const [selectedRooms, setSelectedRooms] = useState<{ [key: string]: boolean }>({});
-
-  // const handleCheckboxChange = (roomId: string, isChecked: boolean) => {
-  //     setSelectedRooms((prevSelectedRooms) => ({
-  //         ...prevSelectedRooms,
-  //         [roomId]: isChecked,
-  //     }));
-  // };
  const navigate= useNavigate()
 
   const { mutate: unlistData } = useMutation({
@@ -67,10 +59,6 @@ const ListingTable: React.FC<MyComponentProps> = ({
     setIsConfirmationModalOpen(true);
   };
 
-  // if (roomInfo.length === 0) {
-  //   return <div>No rooms available</div>;
-  // }
-
   return (
     <div className="flex flex-col text-center">
       <>
@@ -83,7 +71,6 @@ const ListingTable: React.FC<MyComponentProps> = ({
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  {/* <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"> </th> */}
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Hosted Location
                   </th>
