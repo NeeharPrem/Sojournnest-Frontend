@@ -234,3 +234,18 @@ export const deleteCategory = async (data:object) => {
     }
   }
 };
+
+export const allbookings = async (page: number, limit: number) => {
+  try {
+    const response = await Api.get(`${adminEndpoints.allBookings}?page=${page}&limit=${limit}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
