@@ -1,15 +1,31 @@
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 import { JSXElementConstructor, ReactElement, ReactNode, ReactPortal, useState,useEffect} from "react";
-import { roomDetail, addtoWishlist, getWishlist, removeWishlist, checkDateAvailability, payment} from "../../api/userapi";
+import { roomDetail, addtoWishlist, getWishlist, removeWishlist, checkDateAvailability, payment,roomRating,getRoomRating} from "../../api/userapi";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery,useMutation} from "@tanstack/react-query";
 import Loader from '../common/Loader';
 import { toast } from 'sonner';
+import { FaPenFancy } from "react-icons/fa6";
+import Rating from '@mui/material/Rating';
+import { AiFillEdit } from "react-icons/ai";
+import { Button } from 'flowbite-react';
+import {Modal } from 'flowbite-react';
 
 interface DateRange {
     startDate: string;
     endDate: string;
+}
+
+interface ReviewsData{
+    createdAt:Date | string,
+    userId:{
+        fname:string;
+        lname:string;
+        profilePic:string
+    };
+    rating:number;
+    experience:string
 }
 
 const DetailsPage=() => {
@@ -21,6 +37,9 @@ const DetailsPage=() => {
     const [isAvailable, setIsAvailable] = useState(false);
     const [adultCount, setAdultCount] = useState(1);
     const [kidCount, setKidCount] = useState(0);
+    const [showModal,setShowModal]=useState(false)
+    const [rating, setRating] = useState(0.5);
+    const [experience, setExperience] = useState('');
 
     const { roomId } = useParams()
     const navigate= useNavigate()
@@ -28,6 +47,11 @@ const DetailsPage=() => {
     const {isLoading, data: Data} = useQuery({
         queryKey: ['roomDetail',roomId as string],
         queryFn: roomDetail 
+    });
+
+    const {data: reviewData } = useQuery({
+        queryKey: ['ratingData', roomId as string],
+        queryFn: getRoomRating
     });
 
     const { mutate: paymentSession } = useMutation({
@@ -184,6 +208,43 @@ const DetailsPage=() => {
         paymentSession(bookingData)
     }
 
+    const { mutate: roomreview } = useMutation({
+        mutationFn: roomRating,
+        onSuccess: (response) => {
+           if(response?.status===200){
+            toast.success(response?.data.message)
+           }
+        }
+    })
+
+    const reviewSubmit =()=>{
+        const submissionData = {
+            roomId: Data._id, 
+            data: {
+                rating: rating,
+                experience: experience
+            }
+        }
+        roomreview(submissionData)
+        setShowModal(false)
+    }
+
+    const formatDateToLocaleString = (dateInput: Date | string | null) => {
+        if (!dateInput) return 'Not selected';
+        const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+        if (!(date instanceof Date) || isNaN(date.getTime())) {
+            console.error('formatDateToLocaleString was called with an invalid date:', dateInput);
+            return 'Invalid date';
+        }
+
+        let day = date.getDate().toString();
+        let month = (date.getMonth() + 1).toString();
+        const year = date.getFullYear().toString();
+        day = day.length < 2 ? '0' + day : day;
+        month = month.length < 2 ? '0' + month : month;
+        return `${day}/${month}/${year}`;
+    };
+
     return !isLoading ?(
          <>
             <div className="flex flex-row justify-between w-full mb-5 h-20 p-2 border-b-2">
@@ -328,9 +389,59 @@ const DetailsPage=() => {
                     </div>
                 </div>
             </div>
-            <div>
-                <label className="[font-family:'Plus_Jakarta_Sans-Bold',Helvetica] font-bold text-[#1c140c] text-[22px] tracking-[-0.33px] leading-[27.5px] whitespace-nowrap">Reviews</label>
+            <div className='flex flex-col justify-center w-full p-4'>
+                <div className='flex flex-row justify-between border-b pb-3 w-full'>
+                    <label className="[font-family:'Plus_Jakarta_Sans-Bold',Helvetica] font-bold text-[#1c140c] text-[22px] tracking-[-0.33px] leading-[27.5px] whitespace-nowrap">Reviews</label>
+                    <FaPenFancy onClick={() => setShowModal(true)} />
+                </div>
+                <div className='flex flex-col w-full p-3'>
+                    {reviewData.map((item: ReviewsData,index:number)=>
+                        <div key={index} className="flex gap-2 lg:p-3 border rounded-md w-full shadow-md">
+                            <img src={item?.userId?.profilePic ? item.userId.profilePic : "https://res.cloudinary.com/db5rtuzcw/image/upload/v1705087621/profile-pics/ldyrmmxsfsq2p2zoaefx.png"} alt="card" className="w-10 h-10 rounded-full" />
+                            <div className='flex flex-col'>
+                                <p className="text-sm font-bold">{item?.userId?.fname} {item?.userId?.lname}</p>
+                                <p className='text-xs'>{formatDateToLocaleString(item.createdAt)}</p>
+                                <Rating name="half-rating-read" value={item.rating} precision={0.5} readOnly />
+                                <p>{item.experience}</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
+            <Modal show={showModal} onClose={() => setShowModal(false)}>
+                <Modal.Body>
+                    <div className=" bg-white p-4">
+                        <div className='pb-2'>
+                            <label className="font-semibold text-gray-700">How was your stay at "room name'</label>
+                        </div>
+                        <div className='flex flex-col gap-3'>
+                            <div className='flex flex-col gap-2'>
+                                <div className="flex items-center gap-2">
+                                    <label className="font-medium text-gray-600">Rating:</label>
+                                    <Rating name="half-rating" defaultValue={0.5} precision={0.5} onChange={(_event, newValue) => {
+                                        setRating(newValue || 0.5);
+                                    }} className="text-primary" />
+                                </div>
+                            </div>
+                            <div className='flex flex-col gap-2'>
+                                <label className="font-medium text-gray-600">Share your experience</label>
+                                <textarea
+                                    name="experience"
+                                    onChange={(e) => setExperience(e.target.value)}
+                                    placeholder='Share details of your own experience of this place'
+                                    className="block w-full rounded-md py-2 px-3 ring-1 ring-inset ring-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={reviewSubmit}>Post</Button>
+                    <Button color="gray" onClick={() => setShowModal(false)}>
+                        Decline
+                    </Button>
+                </Modal.Footer>
+            </Modal>
          </>
     ):(
        <Loader/>
