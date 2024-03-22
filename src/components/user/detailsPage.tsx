@@ -1,8 +1,8 @@
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 import { JSXElementConstructor, ReactElement, ReactNode, ReactPortal, useState,useEffect} from "react";
-import { roomDetail, addtoWishlist, getWishlist, removeWishlist, checkDateAvailability, payment,roomRating,getRoomRating} from "../../api/userapi";
-import { useParams, useNavigate } from 'react-router-dom';
+import { roomDetail, addtoWishlist, getWishlist, removeWishlist, checkDateAvailability, payment, roomRating, getRoomRating, bookingAndreview, roomReviewEdit } from "../../api/userapi";
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery,useMutation} from "@tanstack/react-query";
 import Loader from '../common/Loader';
 import { toast } from 'sonner';
@@ -38,8 +38,11 @@ const DetailsPage=() => {
     const [adultCount, setAdultCount] = useState(1);
     const [kidCount, setKidCount] = useState(0);
     const [showModal,setShowModal]=useState(false)
+    const [editModal,setEditModal]=useState(false)
     const [rating, setRating] = useState(0.5);
     const [experience, setExperience] = useState('');
+    const [bookingStat,setBookingstat]=useState(true)
+    const [reviewStat,setReviewstat]=useState(true)
 
     const { roomId } = useParams()
     const navigate= useNavigate()
@@ -49,10 +52,34 @@ const DetailsPage=() => {
         queryFn: roomDetail 
     });
 
-    const {data: reviewData } = useQuery({
+    const {data: reviewData,refetch} = useQuery({
         queryKey: ['ratingData', roomId as string],
         queryFn: getRoomRating
     });
+
+    const { data: userReviewData, refetch: reviewRefetch } = useQuery({
+        queryKey: ['userReviewData', roomId as string],
+        queryFn: bookingAndreview
+    });
+
+    useEffect(() => {
+        if (userReviewData?.data.success === false && userReviewData?.data.reason === "nobooking") {
+            setBookingstat(false)
+        }
+    }, [userReviewData]);
+
+    useEffect(() => {
+        if (userReviewData?.data.success === false && userReviewData?.data.reason === "noreview") {
+            setReviewstat(false)
+        }
+    }, [userReviewData]);
+
+    useEffect(()=>{
+        if (userReviewData?.data.success === true){
+            setExperience(userReviewData.data.data.experience)
+            setRating(userReviewData.data.data.rating)
+        }
+    }, [userReviewData])
 
     const { mutate: paymentSession } = useMutation({
         mutationFn: payment,
@@ -158,7 +185,6 @@ const DetailsPage=() => {
             checkInDate: checkIn,
             checkOutDate: checkOut
         };
-        console.log(Data,'data')
         const availability= await checkDateAvailability(Data);
         if(availability?.status==200){
             toast.success(availability.data.message)
@@ -213,7 +239,10 @@ const DetailsPage=() => {
         onSuccess: (response) => {
            if(response?.status===200){
             toast.success(response?.data.message)
+               setReviewstat(true)
            }
+            refetch()
+            reviewRefetch();
         }
     })
 
@@ -227,6 +256,34 @@ const DetailsPage=() => {
         }
         roomreview(submissionData)
         setShowModal(false)
+        refetch()
+        reviewRefetch()
+    }
+
+    const { mutate: ReviewEdit } = useMutation({
+        mutationFn: roomReviewEdit,
+        onSuccess: (response) => {
+            if (response.data.modifiedCount ===1) {
+                toast.success(response?.message)
+                setReviewstat(true)
+            }
+            refetch()
+            reviewRefetch();
+        }
+    })
+
+    const reviewEditSubmit=()=>{
+        const submissionData={
+            roomId:Data._id,
+            data:{
+                rating:rating,
+                experience:experience
+            }
+        }
+        ReviewEdit(submissionData)
+        setEditModal(false)
+        refetch()
+        reviewRefetch()
     }
 
     const formatDateToLocaleString = (dateInput: Date | string | null) => {
@@ -243,6 +300,10 @@ const DetailsPage=() => {
         day = day.length < 2 ? '0' + day : day;
         month = month.length < 2 ? '0' + month : month;
         return `${day}/${month}/${year}`;
+    };
+
+    const handleExperienceChange = (e:any) => {
+        setExperience(e.target.value);
     };
 
     return !isLoading ?(
@@ -306,7 +367,10 @@ const DetailsPage=() => {
                     </div>
                     {Data?.name} is hosted on {formattedDate}
                 </div>
-                <div>
+                <div className='flex flex-col gap-2 items-center'>
+                        <button onClick={() => navigate(`/review/${Data.userId?._id}`)} className='border-2 border-black p-1 rounded-lg'>
+                        Write a review
+                     </button>
                     <button onClick={handleChatWithHost} className="bg-yellow-400 text-white font-bold py-2 px-4 rounded-full">
                         Chat with Host
                     </button>
@@ -392,56 +456,97 @@ const DetailsPage=() => {
             <div className='flex flex-col justify-center w-full p-4'>
                 <div className='flex flex-row justify-between border-b pb-3 w-full'>
                     <label className="[font-family:'Plus_Jakarta_Sans-Bold',Helvetica] font-bold text-[#1c140c] text-[22px] tracking-[-0.33px] leading-[27.5px] whitespace-nowrap">Reviews</label>
-                    <FaPenFancy onClick={() => setShowModal(true)} />
+                    {bookingStat && !reviewStat && <FaPenFancy onClick={() => setShowModal(true)} />}
+                    {bookingStat && reviewStat && <AiFillEdit onClick={() => setEditModal(true)} />}
                 </div>
                 <div className='flex flex-col w-full p-3'>
-                    {reviewData.map((item: ReviewsData,index:number)=>
-                        <div key={index} className="flex gap-2 lg:p-3 border rounded-md w-full shadow-md">
-                            <img src={item?.userId?.profilePic ? item.userId.profilePic : "https://res.cloudinary.com/db5rtuzcw/image/upload/v1705087621/profile-pics/ldyrmmxsfsq2p2zoaefx.png"} alt="card" className="w-10 h-10 rounded-full" />
-                            <div className='flex flex-col'>
-                                <p className="text-sm font-bold">{item?.userId?.fname} {item?.userId?.lname}</p>
-                                <p className='text-xs'>{formatDateToLocaleString(item.createdAt)}</p>
-                                <Rating name="half-rating-read" value={item.rating} precision={0.5} readOnly />
-                                <p>{item.experience}</p>
+                    {reviewData && reviewData.length > 0 ? (
+                        reviewData.map((item: ReviewsData, index: number) => (
+                            <div key={index} className="flex gap-2 lg:p-3 border rounded-md w-full shadow-md">
+                                <img src={item?.userId?.profilePic ? item.userId.profilePic : "https://res.cloudinary.com/db5rtuzcw/image/upload/v1705087621/profile-pics/ldyrmmxsfsq2p2zoaefx.png"} alt="card" className="w-10 h-10 rounded-full" />
+                                <div className='flex flex-col'>
+                                    <p className="text-sm font-bold">{item?.userId?.fname} {item?.userId?.lname}</p>
+                                    <p className='text-xs'>{formatDateToLocaleString(item.createdAt)}</p>
+                                    <Rating name="half-rating-read" value={item.rating} precision={0.5} readOnly />
+                                    <p>{item.experience}</p>
+                                </div>
                             </div>
-                        </div>
+                        ))
+                    ) : (
+                        <p>No reviews available</p>
                     )}
                 </div>
             </div>
-            <Modal show={showModal} onClose={() => setShowModal(false)}>
-                <Modal.Body>
-                    <div className=" bg-white p-4">
-                        <div className='pb-2'>
-                            <label className="font-semibold text-gray-700">How was your stay at "room name'</label>
-                        </div>
-                        <div className='flex flex-col gap-3'>
-                            <div className='flex flex-col gap-2'>
-                                <div className="flex items-center gap-2">
-                                    <label className="font-medium text-gray-600">Rating:</label>
-                                    <Rating name="half-rating" defaultValue={0.5} precision={0.5} onChange={(_event, newValue) => {
-                                        setRating(newValue || 0.5);
-                                    }} className="text-primary" />
+                <Modal show={editModal} onClose={() => setEditModal(false)}>
+                    <Modal.Body>
+                        <div className=" bg-white p-4">
+                            <div className='pb-2'>
+                                <label className="font-semibold text-gray-700">Edit Your Rating</label>
+                            </div>
+                            <div className='flex flex-col gap-3'>
+                                <div className='flex flex-col gap-2'>
+                                    <div className="flex items-center gap-2">
+                                        <label className="font-medium text-gray-600">Rating:</label>
+                                        <Rating name="half-rating" defaultValue={rating} precision={0.5} onChange={(_event, newValue) => {
+                                            setRating(newValue || 0.5);
+                                        }} className="text-primary" />
+                                    </div>
+                                </div>
+                                <div className='flex flex-col gap-2'>
+                                    <label className="font-medium text-gray-600">Share your experience</label>
+                                    <textarea
+                                        name="experience"
+                                    value={experience}
+                                        onChange={handleExperienceChange}
+                                        placeholder='Share details of your own experience of this place'
+                                        className="block w-full rounded-md py-2 px-3 ring-1 ring-inset ring-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
+                                    ></textarea>
                                 </div>
                             </div>
-                            <div className='flex flex-col gap-2'>
-                                <label className="font-medium text-gray-600">Share your experience</label>
-                                <textarea
-                                    name="experience"
-                                    onChange={(e) => setExperience(e.target.value)}
-                                    placeholder='Share details of your own experience of this place'
-                                    className="block w-full rounded-md py-2 px-3 ring-1 ring-inset ring-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
-                                ></textarea>
-                            </div>
                         </div>
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={reviewSubmit}>Post</Button>
-                    <Button color="gray" onClick={() => setShowModal(false)}>
-                        Decline
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={reviewEditSubmit}>Post</Button>
+                        <Button color="gray" onClick={() => setEditModal(false)}>
+                            Decline
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                    <Modal show={showModal} onClose={() => setShowModal(false)}>
+                        <Modal.Body>
+                            <div className=" bg-white p-4">
+                                <div className='pb-2'>
+                                    <label className="font-semibold text-gray-700">How was your stay</label>
+                                </div>
+                                <div className='flex flex-col gap-3'>
+                                    <div className='flex flex-col gap-2'>
+                                        <div className="flex items-center gap-2">
+                                            <label className="font-medium text-gray-600">Rating:</label>
+                                            <Rating name="half-rating" defaultValue={0.5} precision={0.5} onChange={(_event, newValue) => {
+                                                setRating(newValue || 0.5);
+                                            }} className="text-primary" />
+                                        </div>
+                                    </div>
+                                    <div className='flex flex-col gap-2'>
+                                        <label className="font-medium text-gray-600">Share your experience</label>
+                                        <textarea
+                                            name="experience"
+                                            onChange={(e) => setExperience(e.target.value)}
+                                            placeholder='Share details of your own experience of this place'
+                                            className="block w-full rounded-md py-2 px-3 ring-1 ring-inset ring-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
+                                        ></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button onClick={reviewSubmit}>Post</Button>
+                            <Button color="gray" onClick={() => setShowModal(false)}>
+                                Decline
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
          </>
     ):(
        <Loader/>
