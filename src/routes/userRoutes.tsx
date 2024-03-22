@@ -9,6 +9,7 @@ import Bookings from "../pages/user/bookings/bookings";
 import SuccessOrFailure from "../pages/user/success or failure/success";
 import ManageDate from "../pages/userHost/Date/ManageDate";
 import { Reservation } from "../pages/userHost/Reservation/Reservation";
+import ReviewPage from "../pages/userHost/ReviewPage";
 const UserRoutes = () => {
   return (
     <Routes>
@@ -24,6 +25,7 @@ const UserRoutes = () => {
       <Route path='/managedate/:roomId' element={<ManageDate/>}></Route>
       <Route path="/success" element={<SuccessOrFailure />} />
       <Route path="/failure" element={<SuccessOrFailure />} />
+      <Route path="/review/:hostId" element={<ReviewPage />} />
     </Routes>
   );
 };
