@@ -8,6 +8,7 @@ import ChecklistOutlinedIcon from '@mui/icons-material/ChecklistOutlined';
 import PeopleIcon from '@mui/icons-material/People';
 import CategoryIcon from '@mui/icons-material/Category';
 import BookIcon from '@mui/icons-material/Book';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 
 interface MenuItem {
@@ -18,6 +19,7 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { text: "Dashboard", icon: <DashboardIcon />, link: "/admin/dashboard" },
+  { text: "Payment settings", icon: <AccountBalanceWalletIcon />, link: "/admin/payment" },
   { text: "Bookings", icon: <BookIcon />, link: "/admin/bookings" },
   { text: "Listings", icon: <ChecklistOutlinedIcon />, link: "/admin/listings" },
   { text: "Users", icon: <PeopleIcon />, link: "/admin/users" },
