@@ -249,3 +249,49 @@ export const allbookings = async (page: number, limit: number) => {
     }
   }
 };
+
+export const paymentUpdate = async (data:object) => {
+  try {
+    const response = await Api.post(adminEndpoints.paymentUpdate, data);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const oldServiceFee = async () => {
+  try {
+    const response = await Api.get(adminEndpoints.oldServiceFee);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const adminDashboard = async () => {
+  try {
+    const response = await Api.get(`${adminEndpoints.adminDashboard}`);
+    console.log(response, 'dd')
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
