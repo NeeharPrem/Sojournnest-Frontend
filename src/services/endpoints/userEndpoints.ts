@@ -35,10 +35,19 @@ const userEndpoints = {
   blockDates:'/users/host/managedate',
   blockedDates:'/users/host/managedate',
   removeDates:'/users/host/managedate',
+  hostDashboard:'/users/host/hostdashboard',
   upBookings:'/users/host/bookings',
   canBookings:'users/host/bookings',
   hsotcancelBooking:'/users/host/bookings',
-  hostconfirmBooking:'users/host/bookigs'
+  hostconfirmBooking:'users/host/bookigs',
+  roomRating:'/users/rating',
+  roomReviewEdit:'/users/rating',
+  getRoomRating:'/users/rating',
+  bookingAndreview:'/users/rating',
+  hostReviewcheck:'/users/host/rating',
+  user_host_review: '/users/host/rating',
+  HostReviewEdit:'/users/host/rating',
+  getHostRating:'/users/host/rating'
 };
 
 export default userEndpoints;
