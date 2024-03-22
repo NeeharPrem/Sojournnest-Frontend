@@ -91,12 +91,12 @@ const Cancelled = () => {
                         <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Refund amount
                         </th>
-                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {/* <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Cancelled Date
-                        </th>
-                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        </th> */}
+                        {/* <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Cancelled by
-                        </th>
+                        </th> */}
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -123,12 +123,12 @@ const Cancelled = () => {
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                               <div className="text-sm text-gray-900">₹ {item.totalAmount}</div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {/* <td className="px-6 py-4 whitespace-nowrap text-center">
                               <div className="text-sm text-gray-900">{formatDateToLocaleString(new Date(item.updatedAt))}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                               <div className="text-sm text-gray-900">{item.cancelledRole}</div>
-                          </td>
+                          </td> */}
                       </tr>
                   )}
                 </tbody>
