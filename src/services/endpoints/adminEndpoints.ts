@@ -15,7 +15,10 @@ const adminEndpoints = {
   getCategory: "/admins/category",
   deleteAmenity:"/admins/amenities",
   deleteCategory:"/admins/category",
-  allBookings:'/admins/bookings'
+  allBookings:'/admins/bookings',
+  paymentUpdate:'/admins/payments',
+  oldServiceFee:'/admins/payments',
+  adminDashboard:'/admins/adminDashboard'
 };
 
 export default adminEndpoints;
