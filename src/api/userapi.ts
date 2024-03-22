@@ -577,3 +577,154 @@ export const removeDates = async ({ id, data }: { id: string | undefined; data: 
     }
   }
 }
+
+export const roomRating = async ({ roomId, data }: { roomId: string; data: object }) => {
+  try {
+    const response = await Api.post(`${userEndpoints.roomRating}/${roomId}`, data);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const getRoomRating = async ({ queryKey }: QueryFunctionContext<[string, string | null]>) => {
+  const [_, roomId] = queryKey;
+  try {
+    const response = await Api.get(`${userEndpoints.getRoomRating}/${roomId}`);
+    return response.data.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      console.log(errorMessage)
+    } else {
+      console.log(error);
+    }
+  }
+};
+
+export const bookingAndreview = async ({ queryKey }: QueryFunctionContext<[string, string | null]>) => {
+  const [_, roomId] = queryKey;
+  try {
+    const response = await Api.get(`${userEndpoints.getRoomRating}?roomId=${roomId}`);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const roomReviewEdit = async ({ roomId, data }: { roomId: string; data: object }) => {
+  try {
+    const response = await Api.patch(`${userEndpoints.roomReviewEdit}/${roomId}`, data);
+    console.log(response,'respo')
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const hostDashboard = async () => {
+  try {
+    const response = await Api.get(`${userEndpoints.hostDashboard}`);
+    console.log(response,'dd')
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const hostReviewcheck = async ({ queryKey }: QueryFunctionContext<[string, string | null]>) => {
+  const [_, hostId] = queryKey;
+  try {
+    const response = await Api.get(`${userEndpoints.hostReviewcheck}?hostId=${hostId}`);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const user_host_review = async ({ hostId, data }: { hostId: string; data: object }) => {
+  try {
+    const response = await Api.post(`${userEndpoints.user_host_review}/${hostId}`, data);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const getHost = async ({ queryKey }: QueryFunctionContext<[string, string | null]>) => {
+  const [_, hostId] = queryKey;
+  try {
+    const response = await Api.get(`${userEndpoints.getUser}/${hostId}`);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const HostReviewEdit = async ({ hostId, data }: { hostId: string; data: object }) => {
+  try {
+    const response = await Api.patch(`${userEndpoints.HostReviewEdit}/${hostId}`, data);
+    console.log(response, 'respo')
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const getHostRating = async ({ queryKey }: QueryFunctionContext<[string, string | null]>) => {
+  const [_, hostId] = queryKey;
+  try {
+    const response = await Api.get(`${userEndpoints.getHostRating}/${hostId}`);
+    return response.data.data;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      console.log(errorMessage)
+    } else {
+      console.log(error);
+    }
+  }
+};
