@@ -63,9 +63,13 @@ const Allreservation = () => {
         setModalOpen(false);
     };
 
-    const handleAction=()=>{
-        setModalOpen(true);
-    }
+    const handleAction = (event: React.MouseEvent<HTMLButtonElement>) => {
+        const reservationId = event.currentTarget.getAttribute('data-reservation-id');
+        if (reservationId) {
+            setSelectedReservation(reservationId);
+            setModalOpen(true);
+        }
+    };
 
     const formatDateToLocaleString = (date: Date | null) => {
         if (!date) return 'Not selected';
@@ -133,9 +137,9 @@ const Allreservation = () => {
                         <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Action/status
                         </th>
-                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {/* <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Details
-                        </th>
+                        </th> */}
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -173,11 +177,11 @@ const Allreservation = () => {
                                     </button>
                                 ) : 'cancelled')}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-center">
+                            {/* <td className="px-6 py-4 whitespace-nowrap text-center">
                                 <button>
                                     Details
                                 </button>
-                            </td>
+                            </td> */}
                         </tr>
                     ))}
                 </tbody>
