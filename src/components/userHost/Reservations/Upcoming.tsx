@@ -117,9 +117,9 @@ const Upcoming = () => {
                       <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Action
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {/* <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Details
-                      </th>
+                      </th> */}
                   </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -155,11 +155,11 @@ const Upcoming = () => {
                                   </button>
                               )}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {/* <td className="px-6 py-4 whitespace-nowrap text-center">
                               <button>
                                 Details
                               </button>
-                          </td>
+                          </td> */}
                       </tr>
                   ))}
               </tbody>
