@@ -1,14 +1,10 @@
 import Dashboard from "../../components/admin/adminDashboard";
-
+import AdminUiBase from "../../components/common/Admin/AdminUiBase";
 const AdminDash = () => {
   return (
-    <>
-    <div>
-        <div>
+    <AdminUiBase>
           <Dashboard />
-        </div>
-    </div>
-    </>
+      </AdminUiBase>
   );
 };
 
