@@ -2,6 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query"
 import { allBookings, hsotcancelBooking } from "../../../api/userapi"
 import { useState } from "react";
 import HostModal from "../../common/modal/HostModal";
+import HostConfirm from "../../common/modal/HostConfirm";
 
 
 interface Reservation {
@@ -30,19 +31,20 @@ const Allreservation = () => {
         queryKey: ['allData'],
         queryFn: allBookings
     });
-     
 
     const [isModalOpen, setModalOpen] = useState(false);
+    const [isConfirm,setConfrim]=useState(false)
     const [selectedReservation, setSelectedReservation] = useState('');
 
     const handleCancelClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         const reservationId = event.currentTarget.getAttribute('data-reservation-id');
         setSelectedReservation(reservationId || '');
-        setModalOpen(true);
+        setConfrim(true);
     };
 
     const handleClose = () => {
         setModalOpen(false);
+        setConfrim(false)
     };
 
     const { mutate: confirmCancellation } = useMutation({
@@ -55,12 +57,13 @@ const Allreservation = () => {
     })
 
     const handleConfirmCancellation = (selectedValue:string) => {
-        if (selectedValue === 'cancelled'){
+        if (selectedValue === 'confirm'){
             confirmCancellation(selectedReservation)
         } else{
             
         }
         setModalOpen(false);
+        setConfrim(false)
     };
 
     const handleAction = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -187,6 +190,7 @@ const Allreservation = () => {
                 </tbody>
             </table>
             <HostModal isOpen={isModalOpen} onClose={handleClose} onConfirm={handleConfirmCancellation} />
+            <HostConfirm isOpen={isConfirm} onClose={handleClose} onConfirm={handleConfirmCancellation} />
         </div>
     )
 }
