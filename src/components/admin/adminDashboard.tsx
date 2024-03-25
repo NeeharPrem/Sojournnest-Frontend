@@ -9,8 +9,6 @@ export default function Dashboard() {
     queryFn: adminDashboard
   });
 
-  console.log(Data)
-
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   const chartData = Data?.data.monthlyRevenue.map((item: { month: number; year: number; monthlyRevenue: number; }) => ({
