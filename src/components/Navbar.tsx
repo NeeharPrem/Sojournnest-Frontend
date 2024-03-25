@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../api/userapi";
 import { userLogout } from "../store/slice/authSlice";
 import { toast } from "react-toastify";
-import SearchBar from "./user/home/serchBar";
+// import SearchBar from "./user/home/SearchBar"; // Ensure the correct path is used
 
 interface RootState {
   auth: {
@@ -39,63 +39,71 @@ const NavBar = () => {
     { name: "HOME", link: "/" },
     ...(userLoggedin
       ? [
-          ...(location.pathname !== "/Dashboard"
-            ? [{ name: "SWITCH TO HOST", link: "/Dashboard" }]
-            : []),
-          ...(location.pathname === "/Dashboard"
-            ? [{ name: "SWITCH TO USER", link: "/" }]
-            : []),
-          ...(location.pathname !== "/profile"
-            ? [{ name: "PROFILE", link: "/profile" }]
-            : []),
-          { name: "LOGOUT", link: "/logout", action: handleLogout },
-        ]
+        ...(location.pathname !== "/Dashboard"
+          ? [{ name: "SWITCH TO HOST", link: "/Dashboard" }]
+          : []),
+        ...(location.pathname === "/Dashboard"
+          ? [{ name: "SWITCH TO USER", link: "/" }]
+          : []),
+        ...(location.pathname !== "/profile"
+          ? [{ name: "PROFILE", link: "/profile" }]
+          : []),
+        { name: "LOGOUT", link: "/logout", action: handleLogout },
+      ]
       : [{ name: "LOGIN", link: "/login" }]),
   ];
 
   return (
-    <>
-      <div className="shadow-md w-full top-0 left-0 fixed lg:px-6 px-5 md:px-5 bg-white z-50">
-        <div className="md:flex items-center justify-between bg-white py-4 md:px-10">
-          {/* logo section */}
-          <div className="font-medium text-2xl cursor-pointer flex items-center gap-1">
-            {/* <BookOpenIcon className="w-7 h-7 text-blue-600" /> */}
-            <span>SojournNest</span>
-          </div>
-          <div>
+    <div className="shadow-md w-full top-0 left-0 fixed bg-white z-50">
+      <div className="md:flex items-center justify-between py-4 md:px-10 px-5">
+        <div className="font-semibold text-xl cursor-pointer flex items-center text-gray-800">
+          {/* Example place for a logo or brand name */}
+          <span>SojournNest</span>
+        </div>
+
+        {/* Central search bar - only displayed in larger screens */}
+        <div className="hidden md:block flex-grow mx-4">
+          {/* <SearchBar /> */}
+        </div>
+
+        {/* Menu toggle icon for smaller screens */}
+        <div
+          onClick={() => setOpen(!open)}
+          className="md:hidden absolute right-8 top-6 cursor-pointer w-7 h-7"
+        >
+          {open ? <XMarkIcon className="w-6 h-6" /> : <Bars3BottomRightIcon className="w-6 h-6" />}
+        </div>
+
+        {/* Navigation Links */}
+        <ul
+          className={`md:flex items-center absolute md:static bg-white md:z-auto z-[-1] left-0 w-full md:w-auto transition-all duration-500 ease-in ${open ? "top-16" : "top-[-490px]"}`}
+        >
+          {Links.map((link) => (
+            <li key={link.name} className="md:ml-8 text-center md:my-0 my-7">
+              {link.name === "LOGOUT" ? (
+                <a
+                  href="#"
+                  onClick={link.action}
+                  className="text-gray-800 hover:text-blue-400 duration-500"
+                >
+                  {link.name}
+                </a>
+              ) : (
+                <Link to={link.link} className="text-gray-800 hover:text-blue-400 duration-500">
+                  {link.name}
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
+        {/* Mobile search bar - displayed only on smaller screens */}
+        {open && (
+          <div className="md:hidden mt-4 px-5">
             {/* <SearchBar /> */}
           </div>
-          {/* Menu icon */}
-          <div
-            onClick={() => setOpen(!open)}
-            className="absolute right-8 top-6 cursor-pointer md:hidden w-7 h-7"
-          >
-            {open ? <XMarkIcon /> : <Bars3BottomRightIcon />}
-          </div>
-          {/* link items */}
-          <ul
-            className={`md:flex md:items-center md:pb-0 pb-12 absolute md:static bg-white md:z-auto z-[-1] left-0 w-full md:w-auto md:pl-0 pl-9 transition-all duration-500 ease-in ${open ? "top-12" : "top-[-490px]"}`}
-          >
-            {Links.map((link) => (
-              <li key={link.name} className="md:ml-8 md:my-0 my-7 font-semibold">
-                {link.name === "LOGOUT" ? (
-                  <a
-                    href="#"
-                    onClick={link.action}
-                    className="text-gray-800 hover:text-blue-400 duration-500"
-                  >
-                    {link.name}
-                  </a>
-                ) : (
-                  <Link to={link.link}>{link.name}</Link>
-                )}
-              </li>
-            ))}
-          </ul>
-          {/* button */}
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
