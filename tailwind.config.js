@@ -12,6 +12,9 @@ module.exports = withMT({
       fontSize: {
         'custom-size': '4rem',
       },
+      fontFamily: {
+        Arizonia: ["Arizonia", "cursive"],
+      },
     },
   },
   plugins: [require('flowbite/plugin'),],
