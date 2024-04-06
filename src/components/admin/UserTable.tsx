@@ -1,23 +1,50 @@
 import { useMutation } from "@tanstack/react-query";
 import { blockUser } from "../../api/adminapi";
 import { approveUser } from "../../api/adminapi";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import ApproveModal from "../common/modal/approveModal";
 import ConfirmationModal from "../common/modal/confirmationModal";
+import { useQuery } from "@tanstack/react-query";
+import { allUsers } from "../../api/adminapi";
 import { toast } from "sonner";
+import { useEffect } from "react";
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
-interface UserTableProps {
-  userInfos: any[];
-  refetch: any;
-  info: string;
+interface userInfo {
+  _id:string;
+   lname:string;
+   fname:string;
+   email:string;
+   is_approved:boolean;
+   verifyId:string;
+   is_blocked:boolean;
+
 }
 
-const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
+const UserTable= () => {
   const [selectedUserId, setSelectedUserId] = useState("");
   const [selectedUser, setSelectedUser] = useState({ id: "", verifyId: "" });
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
+  const [page, setPage] = useState(1);
+  const limit = 10; 
+
+  const { data: Data, refetch, isSuccess,isLoading} = useQuery({
+    queryKey: ["userData",page,limit],
+    queryFn: () => allUsers(page,limit),
+  });
+
+  useEffect(() => {
+    if (isSuccess && Data) {
+      setTotalPages(Math.ceil(Data?.total / limit));
+    }
+  }, [isSuccess, Data, limit]);
+
+  const handlePageChange = (_event: any, value: SetStateAction<number>) => {
+    setPage(value);
+  };
 
   const { mutate: blockuser } = useMutation({
     mutationFn: blockUser,
@@ -67,6 +94,35 @@ const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
     setIsApproveModalOpen(true);
   };
 
+  if (isLoading) {
+    return (
+      <div className='bg-red-200 overflow-auto'>
+        <table className="min-w-full divide-y divide-gray-200 border-2 rounded-md">
+          <thead className="bg-gray-50">
+            <tr>
+              {["Guest Name", "Check-in", "Check-out", "Room", "Payment amount", "Action", "Details"].map(header => (
+                <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="animate-pulse bg-gray-300 h-4 w-3/4 mx-auto"></div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {Array.from({ length: 2 }).map((_, index) => (
+              <tr key={index}>
+                {Array.from({ length: 7 }).map((_, cellIndex) => (
+                  <td key={cellIndex} className="px-6 py-4 whitespace-nowrap text-center">
+                    <div className="animate-pulse bg-gray-300 h-6 w-5/6 mx-auto"></div>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
 
   return (
     <div className="justify-center flex-col">
@@ -93,7 +149,7 @@ const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
             </tr>
           </thead>
             <tbody>
-              {userInfos.map((data,index) =>
+              {Data?.data.map((data: userInfo,index:number) =>
                 <tr key={index} className="border-b">
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <div className="text-sm text-gray-900">
@@ -147,6 +203,7 @@ const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
               )}
             </tbody>
         </table>
+
           {isApproveModalOpen && (
             <ApproveModal
               message={`${selectedUser.verifyId}`}
@@ -157,7 +214,7 @@ const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
           <>
             {isConfirmationModalOpen && (
               <ConfirmationModal
-                  message={`Are you sure you want to ${userInfos.find((user) => user._id === selectedUserId)?.is_blocked ? "unblock" : "block"} this user?`}
+                  message={`Are you sure you want to ${Data?.data.find((user:userInfo) => user._id === selectedUserId)?.is_blocked ? "unblock" : "block"} this user?`}
                   onConfirm={handleConfirmation}
                   onCancel={closeConfirmationModal}
                 />
@@ -165,9 +222,18 @@ const UserTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
           </>
       </div>
       </>
+      <div className="flex justify-center w-full">
+        <Stack spacing={2} className='pt-2'>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            variant="outlined"
+            shape="rounded" />
+        </Stack>
+      </div>
     </div>
   );
 };
 
 export default UserTable;
-
