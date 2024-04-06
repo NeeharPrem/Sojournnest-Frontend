@@ -47,7 +47,8 @@ const userEndpoints = {
   hostReviewcheck:'/users/host/rating',
   user_host_review: '/users/host/rating',
   HostReviewEdit:'/users/host/rating',
-  getHostRating:'/users/host/rating'
+  getHostRating:'/users/host/rating',
+  saveFcmtoken:'/users/fcm'
 };
 
 export default userEndpoints;
