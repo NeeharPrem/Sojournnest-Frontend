@@ -4,7 +4,6 @@ import Header from "../../../components/Navbar";
 import ConversationList from "../../../components/userHost/Messenger/Conversations";
 import { useQueries, useQuery,useMutation} from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { RootState } from '../../../store/store';
 import { hostgetChat, getUser, hostNewconversation } from "../../../api/userapi";
 import { getMessage } from "../../../api/userapi";
 import socket from "../../../services/socket";
@@ -31,7 +30,7 @@ export const Messanger = () => {
         },
     });
    
-    const userId = useSelector((state: RootState) => state.auth.userId);
+    const userId = useSelector((state: any) => state.auth.userId);
 
     const location = useLocation();
     const rcvId = location.state?.userId;
@@ -141,7 +140,6 @@ export const Messanger = () => {
         setSelectedUserId(userId);
         setConversationIdSelected(conversationId);
         const selectedUserConvo = usersWithConvoId.find(userWithConvo => userWithConvo.user._id === userId);
-        console.log(selectedUserConvo,"convo")
         if (selectedUserConvo) {
             setSelectedUserDetails({
                 fname: selectedUserConvo.user.fname,
