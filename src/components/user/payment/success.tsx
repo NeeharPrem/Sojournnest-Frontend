@@ -1,11 +1,109 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate,useParams} from "react-router-dom"
+import { useEffect,useState} from "react";
+import { getUser } from "../../../api/userapi";
+import { useSelector } from 'react-redux';
+import { RootState } from "../../../store/store";
+import { clearBookingDetails } from "../../../store/slice/bookingSlice";
+import { useDispatch } from 'react-redux';
+import Loader from "../../common/Loader";
+
+
+interface UserData {
+    fcmToken:string
+}
+
+interface UserResponse {
+    data:UserData
+}
+
+interface BookingDetails {
+    roomName: string;
+    checkInDate: string;
+    checkOutDate: string;
+    guestsCount: number;
+    image: string;
+    roomRent: number;
+}
 
 const Successcomp = () => {
 
     const navigate= useNavigate()
+    let {Id } = useParams();
+    const dispatch = useDispatch();
+    const [userData, setUserData] = useState<UserData | null>(null);
+    const [newData,setData]=useState<BookingDetails| null>(null);
+    const booking = useSelector((state: RootState) => state.booking);
+
+    useEffect(() => {
+        if (booking) {
+            setData({
+                roomName: booking.roomName,
+                checkInDate: booking.checkInDate,
+                checkOutDate: booking.checkOutDate,
+                guestsCount: booking.guestsCount,
+                image: booking.image,
+                roomRent: booking.roomRent,
+            });
+        }
+        dispatch(clearBookingDetails());
+        const fetchData = async () => {
+            try {
+                if (Id && Id.trim() !== '') {
+                    const response: UserResponse = await getUser(Id);
+                    setUserData(response.data);
+
+                    if (response.data) {
+                        const fcmToken = response.data.fcmToken;
+                        const YOUR_PROJECT_ID = "notification-b689b";
+                        const YOUR_ACCESS_TOKEN = "BABkit8FHSso4jub4CLZvhFKMCEK32azzzrbpMqIAqKyj8G0WXwt5gHYaUgWjsUYlVwuy4L1uCiZBJ2F29VdW0w";
+                        const message = {
+                            "message": {
+                                "token": fcmToken,
+                                "notification": {
+                                    "title": "New Booking",
+                                    "body": "New Booking added check your dashboard"
+                                },
+                                "webpush": {
+                                    "fcm_options": {
+                                        "link": "https://dummypage.com"
+                                    }
+                                }
+                            }
+                        };
+
+                        fetch(`https://fcm.googleapis.com/v1/projects/${YOUR_PROJECT_ID}/messages:send`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${YOUR_ACCESS_TOKEN}`
+                            },
+                            body: JSON.stringify(message)
+                        })
+                            .then(response => response.json())
+                            .then(data => console.log('FCM message sent:', data))
+                            .catch(error => console.error('Error sending FCM message:', error));
+                    }
+                } else {
+                    console.error('User ID is undefined or empty');
+                }
+            } catch (error) {
+                console.error('Failed to fetch user data:', error);
+            }
+        };
+        fetchData();
+        const timer = setTimeout(() => {
+            navigate('/');
+        }, 240000);
+        return () => clearTimeout(timer);
+    }, [Id, dispatch,navigate]);
+    
 
     const handleViewbook=()=>{
         navigate('/bookings')
+    }
+
+    if (!newData) {
+        return <Loader/>;
     }
   return (
         <>
@@ -17,14 +115,23 @@ const Successcomp = () => {
                   <div className="flex flex-row w-full justify-center lg:pt-5">
                       <div className="flex flex-row justify-between lg:gap-20 md:gap-14 sm:gap-10 border rounded-md p-5 items-center shadow-md ">
                           <div className="lg:gap-3">
-                              <p>Room Name</p>
-                              <p>Booked Date</p>
-                              <p>Number of Guests Booked</p>
+                            <div className="flex flex-col">
+                                  <p>{newData.roomName}</p>
+                                  <div className="flex flex-row gap-2">
+                                      <p>Check in : </p><p>{newData.checkInDate}</p>
+                                  </div>
+                                  <div className="flex flex-row gap-2">
+                                      <p>Check out : </p><p>{newData.checkOutDate}</p>
+                                  </div>
+                                  <div className="flex flex-row gap-2">
+                                      <p>Guests : </p><p>{newData.guestsCount}</p>
+                                  </div>
+                            </div>
                           </div>
                           <div>
                               <div>
                                   <img
-                                      src="https://res.cloudinary.com/db5rtuzcw/image/upload/v1699282053/samples/woman-on-a-football-field.jpg"
+                                      src={newData.image}
                                       alt="Profile Pic"
                                       className="lg:w-20 lg:h-20 md:w-10 md:h-10 sm:w-12 sm:h-12  object-cover rounded-md"
                                   />
@@ -41,11 +148,9 @@ const Successcomp = () => {
                       <div className="flex flex-row justify-between w-full max-w-96">
                           <div className="flex flex-col gap-2">
                               <p className="text-gray-600">Payment</p>
-                              <p className="text-gray-600">Payment id</p>
                           </div>
                           <div className="flex flex-col gap-2">
-                              <p>1000 ₹</p>
-                              <p>i83bi9</p>
+                              <p>{newData.roomRent} ₹</p>
                           </div>
                       </div>
                   </div>
