@@ -424,6 +424,7 @@ export const getBookings = async () => {
   } catch (error) {
     if (error && (error as AxiosError).isAxiosError) {
       console.log(error);
+      return Promise.reject(error);
     } else {
       toast.error("Something went wrong");
     }
@@ -725,6 +726,22 @@ export const getHostRating = async ({ queryKey }: QueryFunctionContext<[string, 
       console.log(errorMessage)
     } else {
       console.log(error);
+    }
+  }
+};
+
+export const saveFcmtoken = async (token: string) => {
+  try {
+    const data={
+      fcmtoken:token
+    }
+    const response = await Api.post(userEndpoints.saveFcmtoken, data);
+    return response;
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
     }
   }
 };
