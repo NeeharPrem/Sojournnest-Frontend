@@ -2,7 +2,7 @@ import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 import { JSXElementConstructor, ReactElement, ReactNode, ReactPortal, useState,useEffect} from "react";
 import { roomDetail, addtoWishlist, getWishlist, removeWishlist, checkDateAvailability, payment, roomRating, getRoomRating, bookingAndreview, roomReviewEdit } from "../../api/userapi";
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate} from 'react-router-dom';
 import { useQuery,useMutation} from "@tanstack/react-query";
 import Loader from '../common/Loader';
 import { toast } from 'sonner';
@@ -11,6 +11,8 @@ import Rating from '@mui/material/Rating';
 import { AiFillEdit } from "react-icons/ai";
 import { Button } from 'flowbite-react';
 import {Modal } from 'flowbite-react';
+import { saveBookingDetails } from '../../store/slice/bookingSlice';
+import { useDispatch } from 'react-redux';
 
 interface DateRange {
     startDate: string;
@@ -46,6 +48,7 @@ const DetailsPage=() => {
 
     const { roomId } = useParams()
     const navigate= useNavigate()
+    const dispatch = useDispatch()
    
     const {isLoading, data: Data} = useQuery({
         queryKey: ['roomDetail',roomId as string],
@@ -150,23 +153,30 @@ const DetailsPage=() => {
         return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
     };
 
-    const handleDateChange = async (value: Date) => {
-        const formattedValue = formatDate(value);
-        if (isCheckInSelected) {
-            setCheckInDate(formattedValue);
-            setIsCheckInSelected(false);
-            const nextDay = new Date(value);
-            nextDay.setDate(nextDay.getDate() + 1);
-            setMinCheckoutDate(nextDay);
-            if (checkOutDate) {
-                setCheckOutDate(""); 
-                setIsAvailable(false);
+    const handleDateChange = (value: Date | null, _event: React.MouseEvent<HTMLButtonElement>) => {
+        if (value instanceof Date) {
+            const formattedValue = formatDate(value);
+            if (isCheckInSelected) {
+                setCheckInDate(formattedValue);
+                setIsCheckInSelected(false);
+                const nextDay = new Date(value);
+                nextDay.setDate(nextDay.getDate() + 1);
+                setMinCheckoutDate(nextDay);
+                if (checkOutDate) {
+                    setCheckOutDate("");
+                    setIsAvailable(false);
+                }
+            } else {
+                setCheckOutDate(formattedValue);
+                if (checkInDate && formattedValue) {
+                    checkAvailability(checkInDate, formattedValue);
+                }
             }
-        } else {
-            setCheckOutDate(formattedValue);
-            if (checkInDate && formattedValue) {
-                await checkAvailability(checkInDate, formattedValue);
-            }
+        } else if (value === null) {
+            console.log('Date cleared');
+            setCheckInDate("");
+            setCheckOutDate("");
+            setIsAvailable(false);
         }
     };
 
@@ -231,6 +241,15 @@ const DetailsPage=() => {
             hostId:Data.userId._id,
             totalAmount:Data.rent
         }
+        const saveBook={
+            roomName: Data?.name,
+            checkInDate: bookingData.checkInDate,
+            checkOutDate: bookingData.checkOutDate,
+            guestsCount:bookingData.guests,
+            roomRent:bookingData.totalAmount,
+            image:Data.images[0]
+        }
+        dispatch(saveBookingDetails(saveBook));
         paymentSession(bookingData)
     }
 
@@ -381,7 +400,7 @@ const DetailsPage=() => {
                 <div className='flex flex-row justify-center gap-4 pt-3'>
                     <div>
                         <Calendar
-                            onChange={handleDateChange}
+                            onChange={(value: any, event: React.MouseEvent<HTMLButtonElement>) => handleDateChange(value as Date | null, event)}
                             value={isCheckInSelected ? (checkInDate ? new Date(checkInDate) : new Date()) : (checkOutDate ? new Date(checkOutDate) : new Date())}
                             minDate={isCheckInSelected ? new Date() : minCheckoutDate}
                             tileClassName={({ date, view }) => {
@@ -391,6 +410,10 @@ const DetailsPage=() => {
                             }}
                             tileDisabled={({ date, view }) => {
                                 if (view !== 'month') return false;
+                                const currentYear = new Date().getFullYear();
+                                if (date.getFullYear() > currentYear) {
+                                    return true;
+                                }
                                 return Data?.blockedDates?.some(({ startDate, endDate }: DateRange) => {
                                     const start = new Date(startDate);
                                     const end = new Date(endDate);
