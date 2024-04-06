@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  BookOpenIcon,
   Bars3BottomRightIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
@@ -9,7 +8,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../api/userapi";
 import { userLogout } from "../store/slice/authSlice";
 import { toast } from "react-toastify";
-// import SearchBar from "./user/home/SearchBar"; // Ensure the correct path is used
 
 interface RootState {
   auth: {
