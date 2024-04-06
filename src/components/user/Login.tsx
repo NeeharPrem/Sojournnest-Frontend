@@ -7,6 +7,7 @@ import { jwtDecode } from "jwt-decode";
 import { login} from "../../api/userapi";
 import { useMutation } from "@tanstack/react-query";
 import { setLogin } from "../../store/slice/authSlice";
+import { saveFcmtoken } from "../../api/userapi";
 
 const G_Password = import.meta.env.VITE_GOOGLE_PASSWORD;
 
@@ -30,10 +31,19 @@ const Login = () => {
         }
     }, [userLoggin]);
 
+    const handleTokenAfterLogin = async () => {
+        const locallyStoredToken = localStorage.getItem('fcmToken');
+        if (locallyStoredToken) {
+            console.log(locallyStoredToken)
+            await saveFcmtoken(locallyStoredToken);
+            localStorage.removeItem('fcmToken');
+        }
+    };
+
 
     const { mutate: userLoginMutate } = useMutation({
         mutationFn: login,
-        onSuccess: (response) => {
+        onSuccess:async (response) => {
             if (response?.status == 200) {
                 toast.success("Login Successfull");
                 const data = {
@@ -42,6 +52,7 @@ const Login = () => {
                     lname: response.data?.message?.lname,
                 };
                 dispatch(setLogin({ userId: data.id, userLoggedin: data }));
+                await handleTokenAfterLogin();
                 navigate("/");
             }
         },
@@ -62,6 +73,7 @@ const Login = () => {
                 lname: result.data.message.lname,
             };
             dispatch(setLogin({ userId: data.id, userLoggedin: data }));
+            await handleTokenAfterLogin();
             navigate("/");
         } else {
             console.log("Error");
