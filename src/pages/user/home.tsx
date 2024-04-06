@@ -31,7 +31,7 @@ const UserHome = () => {
           <div className="absolute w-full h-full top-0 flex items-center pl-10 z-10">
             <div className="text-white flex flex-col text-5xl font-bold">
               <div className="font-Arizonia text-orange-400">
-                Welcome to Render
+                Welcome to Sojourn
               </div>
               <div>Discover Your Favorite</div>
               <div>Place with Us</div>
@@ -46,7 +46,19 @@ const UserHome = () => {
           </Slider>
         </div>
       </div>
-      <div className="flex flex-col relative lg:px-12 px-5 sm:px-10 md:px-10 pt-1">
+      {/* <div className='flex w-full h-20 px-16 py-2'>
+        <div className="flex w-full justify-evenly bg-yellow-200 rounded-md border">
+          <div className="grid grid-cols-4 grid-rows-1 gap-3 w-full h-full p-1">
+            <div className="flex justify-center items-center bg-white">
+              
+            </div>
+            <div className="flex justify-center items-center bg-white">Choose the date</div>
+            <div className="flex justify-center items-center bg-white">Guests count</div>
+            <div className="flex justify-center items-center bg-white" style={{ flexBasis: '50%', flexGrow: 0 }}>Search button</div>
+          </div>
+        </div>
+      </div> */}
+      <div id='home' className="flex flex-col relative lg:px-12 px-5 sm:px-10 md:px-10 pt-1">
         <div>
           <HomePage />
         </div>
