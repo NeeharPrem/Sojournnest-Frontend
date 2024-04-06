@@ -1,23 +1,50 @@
 import { useMutation } from "@tanstack/react-query";
 import { approveListing } from "../../api/adminapi";
 import { blockListing } from "../../api/adminapi";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import ListingApprove from "../common/modal/ListingApprove";
 import ConfirmationModal from "../common/modal/confirmationModal";
+import { useQuery } from "@tanstack/react-query";
+import { allListings }from "../../api/adminapi"
+import { useEffect } from "react";
 import { toast } from "sonner";
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
-interface UserTableProps {
-    userInfos: {
-        data:any[]
-    };
-    refetch: any;
-    info: string;
+interface listProps {
+    _id:string;
+   name:string;
+   userId:{
+    fname:string;
+    lname:string;
+   };
+    is_approved:boolean;
+    is_blocked:boolean;
 }
 
-const ListingTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
+const ListingTable= () => {
     const [selectedUserId, setSelectedUserId] = useState("");
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
     const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
+    const [totalPages, setTotalPages] = useState(0);
+    const [page, setPage] = useState(1);
+    const limit = 10; 
+
+    const { data: Data, refetch,isSuccess,isLoading} = useQuery({
+        queryKey: ["RoomData",page,limit],
+        queryFn: () => allListings(page,limit),
+    });
+
+    useEffect(() => {
+        if (isSuccess && Data) {
+            setTotalPages(Math.ceil(Data?.total / limit));
+        }
+    }, [isSuccess, Data, limit]);
+
+
+    const handlePageChange = (_event: any, value: SetStateAction<number>) => {
+        setPage(value);
+    };
 
     const { mutate: blockList } = useMutation({
       mutationFn: blockListing,
@@ -65,6 +92,35 @@ const ListingTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
         setSelectedUserId(roomId)
         setIsApproveModalOpen(true);
     };
+
+    if (isLoading) {
+        return (
+            <div className='bg-red-200 overflow-auto'>
+                <table className="min-w-full divide-y divide-gray-200 border-2 rounded-md">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            {["Guest Name", "Check-in", "Check-out", "Room", "Payment amount", "Action", "Details"].map(header => (
+                                <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <div className="animate-pulse bg-gray-300 h-4 w-3/4 mx-auto"></div>
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {Array.from({ length: 2 }).map((_, index) => (
+                            <tr key={index}>
+                                {Array.from({ length: 7 }).map((_, cellIndex) => (
+                                    <td key={cellIndex} className="px-6 py-4 whitespace-nowrap text-center">
+                                        <div className="animate-pulse bg-gray-300 h-6 w-5/6 mx-auto"></div>
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        );
+    }
  
 
     return (
@@ -92,7 +148,7 @@ const ListingTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {userInfos?.data?.map((data, index) =>
+                            {Data?.data.map((data: listProps, index:number) =>
                                 <tr key={index} className="border-b">
                                     <td className="px-6 py-4 whitespace-nowrap text-center">
                                         <div className="text-sm text-gray-900">
@@ -148,7 +204,7 @@ const ListingTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
                     </table>
                     {isApproveModalOpen && (
                         <ListingApprove
-                            message={`Are you sure you want to approve '${userInfos.data.find((listing) => listing._id === selectedUserId)?.name}' ?`}
+                            message={`Are you sure you want to approve '${Data.data.find((listing:listProps) => listing._id === selectedUserId)?.name}' ?`}
                             onConfirm={approveConfirmation}
                             onCancel={closeApproveModal}
                         />
@@ -156,7 +212,7 @@ const ListingTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
                     <>
                         {isConfirmationModalOpen && (
                             <ConfirmationModal
-                                message={`Are you sure you want to ${userInfos.data.find((listing) => listing._id === selectedUserId)?.is_blocked ? "unblock" : "block"} this listing?`}
+                                message={`Are you sure you want to ${Data.data.find((listing:listProps) => listing._id === selectedUserId)?.is_blocked ? "unblock" : "block"} this listing?`}
                                 onConfirm={blockConfirmation}
                                 onCancel={closeConfirmationModal}
                             />
@@ -164,9 +220,18 @@ const ListingTable: React.FC<UserTableProps> = ({ userInfos, refetch}) => {
                     </>
                 </div>
             </>
+            <div className="flex justify-center w-full">
+                <Stack spacing={2} className='pt-2'>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={handlePageChange}
+                        variant="outlined"
+                        shape="rounded" />
+                </Stack>
+            </div>
         </div>
     );
 };
 
 export default ListingTable;
-
