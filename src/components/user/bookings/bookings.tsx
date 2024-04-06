@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import Loader from "../../common/Loader";
 import { getBookings, cancelBooking } from "../../../api/userapi";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState,useEffect} from "react";
 import Cancelled from "./cancelled";
 import { toast } from "sonner";
 
@@ -11,12 +11,10 @@ interface BookingItem {
     roomId: {
         images: string[];
         name: string;
-        bedrooms: string;
-        guests: string;
-        bathrooms: string;
     };
     checkInDate: string;
     checkOutDate: string;
+    guests:number
 }
 
 const Booking = () => {
@@ -35,12 +33,17 @@ const Booking = () => {
         queryFn: getBookings,
     });
 
+    useEffect(() => {
+        refetch();
+    }, [isUpcoming, refetch]);
+
     const { mutate: cancelBookingMutation } = useMutation({
         mutationFn: cancelBooking,
         onSuccess: (response) => {
-            if (response?.status === 200) {
+            if (response) {
                 toast.success(response.data.message);
                 refetch();
+                setIsUpcoming(false)
             }
         },
     });
@@ -87,7 +90,7 @@ const Booking = () => {
                 hasBookings ? (
                     bookingsData?.data.map((room: BookingItem) => (
                         <div key={room._id} className="flex mt-5 px-5">
-                            <div className="flex flex-row justify-between items-center p-5 w-full shadow-md rounded-md border">
+                            <div className="flex flex-row justify-between items-center p-5 w-full shadow-md rounded-md border border-green-500">
                                 <div className="flex flex-row gap-4">
                                     <div>
                                         <img
@@ -101,7 +104,7 @@ const Booking = () => {
                                             <p className="font-bold">{room.roomId.name}</p>
                                         </div>
                                         <div className="flex flex-row gap-1">
-                                            <p>{room.roomId.bedrooms} Beds . {room.roomId.guests} Guests . {room.roomId.bathrooms} Bathrooms</p>
+                                            <p>{room.guests} Guests</p>
                                         </div>
                                         <div className="flex flex-row text-black mt-1">
                                             {formatDate(room.checkInDate)} - {formatDate(room.checkOutDate)}
