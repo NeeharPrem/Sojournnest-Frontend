@@ -1,18 +1,13 @@
-import { useMutation,useQuery} from '@tanstack/react-query';
+import { useMutation} from '@tanstack/react-query';
 import { useState} from "react";
-import { paymentUpdate,oldServiceFee} from '../../api/adminapi';
+import { paymentUpdate} from '../../api/adminapi';
 import { toast } from 'sonner';
 
 
 const Payments = () => {
     const [serviceFee, setServiceFee]=useState<number>(0)
     const [reason,setReason]=useState<string>('')
-
-    // const { isLoading, data: Data } = useQuery({
-    //     queryKey: ['ServiceData'],
-    //     queryFn: oldServiceFee
-    // });
-
+    
     const { mutate: paymetsUp } = useMutation({
         mutationFn: paymentUpdate,
         onSuccess: (response) => {
