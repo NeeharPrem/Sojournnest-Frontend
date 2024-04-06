@@ -29,10 +29,10 @@ export const logout= async()=>{
 }
 }
 
-export const allUsers = async (admin: Object) => {
+export const allUsers = async (page: number, limit: number) => {
   try {
-    const response = await Api.get(adminEndpoints.allUsers, admin);
-    return response;
+    const response = await Api.get(`${adminEndpoints.allUsers}?page=${page}&limit=${limit}`);
+    return response.data;
   } catch (error) {
     if (error && (error as AxiosError).isAxiosError) {
       console.log(error);
@@ -55,10 +55,10 @@ export const blockUser = async (id: string) => {
   }
 };
 
-export const allListings = async (admin: Object) => {
+export const allListings = async (page:number,limit:number) => {
   try {
-    const response = await Api.get(adminEndpoints.allListings, admin);
-    return response;
+    const response = await Api.get(`${adminEndpoints.allListings}?page=${page}&limit=${limit}`);
+    return response.data;
   } catch (error) {
     if (error && (error as AxiosError).isAxiosError) {
       console.log(error);
