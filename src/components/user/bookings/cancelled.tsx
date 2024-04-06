@@ -1,13 +1,11 @@
 import Loader from "../../common/Loader";
 import { useQuery } from "@tanstack/react-query";
 import { cancelledBookings } from "../../../api/userapi";
+import { useEffect } from "react";
 
 interface BookingRoom {
     images: string[];
     name: string;
-    bedrooms: number;
-    guests: number;
-    bathrooms: number;
 }
 
 interface BookingItem {
@@ -15,14 +13,19 @@ interface BookingItem {
     roomId: BookingRoom;
     checkInDate: string;
     checkOutDate: string;
+    guests: number;
 }
 
 const Cancelled = () => {
 
-    const { data: bookingsData, isLoading, refetch } = useQuery({
+    const { data: bookingsData, isLoading,refetch} = useQuery({
         queryKey: ["cancelledData"],
         queryFn: cancelledBookings,
     });
+
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     const formatDate = (dateString: string) => {
         const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short', year: 'numeric' };
@@ -33,10 +36,10 @@ const Cancelled = () => {
     if (isLoading) return <Loader/>;
 
   return (
-      <div className="flexbg-blue-gray-500 mt-5 px-5">
+      <div className="mt-5 px-5">
           {bookingsData?.data?.map((room: BookingItem) => (
               <div key={room._id} className="flex mt-5 px-5">
-                  <div className="flex flex-row justify-between items-center p-5 w-full shadow-md rounded-md border">
+                  <div className="flex flex-row justify-between items-center p-5 w-full shadow-md rounded-md border border-red-500">
                       <div className="flex flex-row gap-4">
                           <div>
                               <img
@@ -50,7 +53,7 @@ const Cancelled = () => {
                                   <p className="font-bold">{room.roomId.name}</p>
                               </div>
                               <div className="flex flex-row gap-1">
-                                  <p>{room.roomId.bedrooms} Beds · {room.roomId.guests} Guests · {room.roomId.bathrooms} Bathrooms</p>
+                                  <p>{room.guests} Guests</p>
                               </div>
                               <div className="flex flex-row text-black mt-1">
                                   {formatDate(room.checkInDate)} - {formatDate(room.checkOutDate)}
