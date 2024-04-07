@@ -11,7 +11,8 @@ const initialBookingState = loadInitialBookingState() || {
     checkOutDate: '',
     guestsCount: 0,
     roomRent: 0,
-    image:''
+    image:'',
+    hostId:''
 };
 
 const bookingSlice = createSlice({
@@ -31,7 +32,8 @@ const bookingSlice = createSlice({
                 checkOutDate: '',
                 guestsCount: 0,
                 roomRent: 0,
-                image:''
+                image:'',
+                hostId:''
             };
         },
     },
