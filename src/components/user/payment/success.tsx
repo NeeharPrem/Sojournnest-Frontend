@@ -1,4 +1,4 @@
-import { useNavigate,useParams} from "react-router-dom"
+import { useNavigate} from "react-router-dom"
 import { useEffect,useState} from "react";
 import { getUser } from "../../../api/userapi";
 import { useSelector } from 'react-redux';
@@ -23,12 +23,12 @@ interface BookingDetails {
     guestsCount: number;
     image: string;
     roomRent: number;
+    hostId:string;
 }
 
 const Successcomp = () => {
 
     const navigate= useNavigate()
-    let {Id } = useParams();
     const dispatch = useDispatch();
     const [, setUserData] = useState<UserData | null>(null);
     const [newData,setData]=useState<BookingDetails| null>(null);
@@ -43,9 +43,11 @@ const Successcomp = () => {
                 guestsCount: booking.guestsCount,
                 image: booking.image,
                 roomRent: booking.roomRent,
+                hostId:booking.hostId
             });
         }
         dispatch(clearBookingDetails());
+        const Id = newData?.hostId
         const fetchData = async () => {
             try {
                 if (Id && Id.trim() !== '') {
@@ -94,7 +96,7 @@ const Successcomp = () => {
             navigate('/');
         }, 240000);
         return () => clearTimeout(timer);
-    }, [Id, dispatch,navigate]);
+    }, [dispatch,navigate]);
     
 
     const handleViewbook=()=>{
