@@ -513,9 +513,10 @@ export const hsotcancelBooking = async (Id: string) => {
   }
 }
 
-export const hostconfirmBooking = async (Id: string,data:object) => {
+
+export const hostconfirmBooking = async (Id: string) => {
   try {
-    const response = await Api.patch(`${userEndpoints.hostconfirmBooking}/${Id}`,data)
+    const response = await Api.patch(`${userEndpoints.hostconfirmBooking}/${Id}`)
     return response
   } catch (error) {
     if (error && (error as AxiosError).isAxiosError) {
