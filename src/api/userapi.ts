@@ -295,7 +295,7 @@ export const unlist = async (id: string) => {
 };
 
 
-export const roomDataUpdate = async (id: string, updateData: FormData) => {
+export const roomDataUpdate = async (id: string | undefined, updateData: FormData) => {
   try {
     const response = await Api.put(userEndpoints.roomDataUpdate + `/${id}`, updateData);
     return response;
