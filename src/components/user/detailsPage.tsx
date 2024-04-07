@@ -24,7 +24,8 @@ interface ReviewsData{
     userId:{
         fname:string;
         lname:string;
-        profilePic:string
+        profilePic:string,
+        _id:string
     };
     rating:number;
     experience:string
@@ -247,7 +248,8 @@ const DetailsPage=() => {
             checkOutDate: bookingData.checkOutDate,
             guestsCount:bookingData.guests,
             roomRent:bookingData.totalAmount,
-            image:Data.images[0]
+            image:Data.images[0],
+            hostId:Data.userId._id
         }
         dispatch(saveBookingDetails(saveBook));
         paymentSession(bookingData)
