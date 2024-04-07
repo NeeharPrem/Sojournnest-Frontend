@@ -1,5 +1,5 @@
 import adminEndpoints from "../services/endpoints/adminEndpoints";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { AxiosError } from "axios";
 import Api from "../services/api";
 
@@ -63,7 +63,7 @@ export const allListings = async (page:number,limit:number) => {
     if (error && (error as AxiosError).isAxiosError) {
       console.log(error);
     } else {
-      toast.error("Something went wrong");
+      toast.error("No Bookings");
     }
   }
 };
