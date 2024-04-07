@@ -6,7 +6,6 @@ import { HostDash } from "../pages/userHost/HostDashboard";
 import { Messanger } from "../pages/userHost/Messenger/Messanger";
 import Wishlist from "../pages/user/wishlist/wishlist";
 import Bookings from "../pages/user/bookings/bookings";
-import SuccessOrFailure from "../pages/user/success or failure/success";
 import ManageDate from "../pages/userHost/Date/ManageDate";
 import { Reservation } from "../pages/userHost/Reservation/Reservation";
 import ReviewPage from "../pages/userHost/ReviewPage";
@@ -23,8 +22,6 @@ const UserRoutes = () => {
       <Route path="/wishlist" element={<Wishlist/>}></Route>
       <Route path="/bookings" element={<Bookings/>}></Route>
       <Route path='/managedate/:roomId' element={<ManageDate/>}></Route>
-      <Route path="/success" element={<SuccessOrFailure />} />
-      <Route path="/failure" element={<SuccessOrFailure />} />
       <Route path="/review/:hostId" element={<ReviewPage />} />
     </Routes>
   );
