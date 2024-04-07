@@ -30,7 +30,7 @@ const Successcomp = () => {
     const navigate= useNavigate()
     let {Id } = useParams();
     const dispatch = useDispatch();
-    const [userData, setUserData] = useState<UserData | null>(null);
+    const [, setUserData] = useState<UserData | null>(null);
     const [newData,setData]=useState<BookingDetails| null>(null);
     const booking = useSelector((state: RootState) => state.booking);
 
@@ -51,7 +51,6 @@ const Successcomp = () => {
                 if (Id && Id.trim() !== '') {
                     const response: UserResponse = await getUser(Id);
                     setUserData(response.data);
-
                     if (response.data) {
                         const fcmToken = response.data.fcmToken;
                         const YOUR_PROJECT_ID = "notification-b689b";
