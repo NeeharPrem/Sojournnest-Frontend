@@ -5,7 +5,6 @@ import Dropdown from '../../common/DropDown/Dropdown';
 import { toast } from "react-toastify";
 import { useMutation,useQuery} from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-// import StateDistrictDropdown from '../../common/DropDown/StateDistrictDropdown';
 import { useNavigate } from 'react-router-dom';
 import { addRoom} from '../../../api/userapi';
 import { getAmenity} from '../../../api/userapi';
@@ -23,16 +22,10 @@ const AddRoom: React.FC = () => {
   const [showAmenityField, setShowAmenityField] = useState<boolean>(false);
   const [amenities, setAmenities] = useState<string[]>([]);
   const [roomImages, setRoomImages] = useState<File[]>([]);
-  // const [selectedState, setSelectedState] = useState<string>('');
-  // const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [seletctedCategory, setCategory] = useState<string>('');
 
   const navigate = useNavigate()
 
-  // const handleSelectState = (state: string, district: string) => {
-  //   setSelectedState(state);
-  //   setSelectedDistrict(district);
-  // };
   
   const url =`https://api.geoapify.com/v1/geocode/reverse?lat=${selectedLocation?.latitude}&lon=${selectedLocation?.longitude}&apiKey=bbe9d00c85d542938910401c269a06cd`;
   const { data: locationData,isLoading} = useQuery({
@@ -119,7 +112,6 @@ const AddRoom: React.FC = () => {
     const formData = new FormData(e.currentTarget);
     formData.append("latitude", selectedLocation?.latitude?.toString() || '')
     formData.append("longitude", selectedLocation?.longitude?.toString() || '')
-    // formData.append('amenities', JSON.stringify(amenities));
     amenities.forEach((amenity, index) => {
       formData.append(`amenities[${index}]`, amenity);
     });
@@ -198,10 +190,6 @@ const AddRoom: React.FC = () => {
       return
     }
 
-    // if (!subdesciption.trim()) {
-    //   toast.error('Sub description cannot be empty');
-    //   return;
-    // }
 
     if (/^\d+$/.test(subdesciption)) {
       toast.error('Sub description cannot be a number');
@@ -410,9 +398,6 @@ const AddRoom: React.FC = () => {
                   placeholder="Sub description"
                 />
               </div>
-              {/* <div className='my-10'>
-                <StateDistrictDropdown onSelectState={handleSelectState} />
-              </div> */}
             </div>
             <div className='flex-col justify-center gap-2'>
               <div id="amenities" className='items-center'>
