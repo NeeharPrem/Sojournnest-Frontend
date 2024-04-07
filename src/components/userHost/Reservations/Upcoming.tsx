@@ -1,8 +1,8 @@
-import { useQuery,useMutation} from "@tanstack/react-query"
+import { useQuery} from "@tanstack/react-query"
 import {upBookings } from "../../../api/userapi";
-import { useState} from "react";
-import Modal from "../../common/modal/Modal";
-import { hsotcancelBooking } from "../../../api/userapi";
+// import { useState} from "react";
+// import Modal from "../../common/modal/Modal";
+// import { hsotcancelBooking } from "../../../api/userapi";
 
 interface Reservation {
     _id:string;
@@ -20,37 +20,37 @@ interface Reservation {
     cancelReq:boolean;
 }
 const Upcoming = () => {
-    const { isLoading, data: Data,refetch} = useQuery({
+    const { isLoading, data: Data} = useQuery({
         queryKey: ['bookingsData'],
         queryFn: upBookings
     });
 
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [selectedReservation, setSelectedReservation] = useState('');
+    // const [isModalOpen, setModalOpen] = useState(false);
+    // const [selectedReservation, setSelectedReservation] = useState('');
 
-    const handleCancelClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        const reservationId = event.currentTarget.getAttribute('data-reservation-id');
-        setSelectedReservation(reservationId || '');
-        setModalOpen(true);
-    };
+    // const handleCancelClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    //     const reservationId = event.currentTarget.getAttribute('data-reservation-id');
+    //     setSelectedReservation(reservationId || '');
+    //     setModalOpen(true);
+    // };
 
-    const handleClose = () => {
-        setModalOpen(false);
-    };
+    // const handleClose = () => {
+    //     setModalOpen(false);
+    // };
 
-    const { mutate: confirmCancellation } = useMutation({
-        mutationFn: hsotcancelBooking,
-        onSuccess: (response) => {
-            if(response?.status===200){
-                refetch()
-            }
-        }
-    })
+    // const { mutate: confirmCancellation } = useMutation({
+    //     mutationFn: hsotcancelBooking,
+    //     onSuccess: (response) => {
+    //         if(response?.status===200){
+    //             refetch()
+    //         }
+    //     }
+    // })
 
-    const handleConfirmCancellation = () => {
-        confirmCancellation(selectedReservation)
-        setModalOpen(false);
-    };
+    // const handleConfirmCancellation = () => {
+    //     confirmCancellation(selectedReservation)
+    //     setModalOpen(false);
+    // };
 
     const formatDateToLocaleString = (date: Date | null) => {
         if (!date) return 'Not selected';
@@ -114,12 +114,6 @@ const Upcoming = () => {
                       <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Payment amount
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Action
-                      </th>
-                      {/* <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Details
-                      </th> */}
                   </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -140,31 +134,11 @@ const Upcoming = () => {
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                               <div className="text-sm text-gray-900">₹ {item.totalAmount}</div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                              {item.cancelReq ? (
-                                  <button
-                                      onClick={handleCancelClick}
-                                      data-reservation-id={item._id}
-                                      className="bg-red-500 text-white lg:p-2 rounded-md"
-                                  >
-                                      Cancel Request
-                                  </button>
-                              ) : (
-                                  <button className="bg-gray-500 text-white lg:p-2 rounded-md" onClick={() => confirmBooking(item.id)}>
-                                      Action
-                                  </button>
-                              )}
-                          </td>
-                          {/* <td className="px-6 py-4 whitespace-nowrap text-center">
-                              <button>
-                                Details
-                              </button>
-                          </td> */}
                       </tr>
                   ))}
               </tbody>
           </table>
-            <Modal isOpen={isModalOpen} onClose={handleClose} onConfirm={handleConfirmCancellation} />
+            {/* <Modal isOpen={isModalOpen} onClose={handleClose} onConfirm={handleConfirmCancellation} /> */}
       </div>
   )
 }
