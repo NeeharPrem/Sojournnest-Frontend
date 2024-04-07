@@ -3,9 +3,11 @@ import AddLocation from '../addLocation/AddLocation';
 import { BiReset } from "react-icons/bi";
 import Dropdown from '../../common/DropDown/Dropdown';
 import { toast } from "react-toastify";
-import StateDistrictDropdown from '../../common/DropDown/StateDistrictDropdown';
 import { roomData, roomDataUpdate } from '../../../api/userapi';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import Loader from '../../common/Loader';
+import { getCategory, getAmenity } from '../../../api/userapi';
 
 interface Location {
     longitude: number;
@@ -16,13 +18,6 @@ interface Room {
     _id: string;
     id:string
 }
-
-// interface DropdownProps {
-//     options: string[];
-//     onSelect: (selectedValue: string) => void;
-//     label: string;
-//     value: string;
-// }
 
 interface editProps {
     Id: string | undefined
@@ -45,8 +40,31 @@ interface MyFormData {
     category: string;
 }
 const EditRoom = ({ Id }: editProps) => {
+    const {
+        data: categoryData,
+    } = useQuery({
+        queryKey: ["catData"],
+        queryFn: getCategory,
+    });
+
+    let cData
+    if (categoryData) {
+        cData = categoryData[0].category
+    }
+
+    const {
+        data,
+    } = useQuery({
+        queryKey: ["amnyData"],
+        queryFn: getAmenity,
+    });
+
+    let aData
+    if (data) {
+        aData = data[0].amenities
+    }
     const navigate=useNavigate()
-    const [room, setRoom] = useState<Room | object>({})
+    const [, setRoom] = useState<Room | object>({})
     const [roomImages, setRoomImages] = useState<File[]>([]);
     const [addImages, setAddImages]=useState<File[]>([])
     const [formData, setFormData] = useState<MyFormData>({
@@ -65,33 +83,31 @@ const EditRoom = ({ Id }: editProps) => {
         images: ['', '', '', '', ''],
         description: '',
     });
-    let roomId: string
 
     useEffect(() => {
         const fetchData = async () => {
             const res = await roomData(Id)
             const Data = res?.data
-            setRoom(Data.data)
+            setRoom(Data)
             if (Data) {
                 setFormData({
-                    name: Data.data.name || '',
-                    bathrooms: Data.data.bathrooms || '',
-                    bedrooms: Data.data.bedrooms|| '',
-                    guests: Data.data.guests || '',
-                    rent: Data.data.rent || '',
-                    state: Data.data.state ||'',
-                    district: Data.data.district|| '',
-                    longitude: Data.data.longitude,
-                    latitude: Data.data.latitude,
-                    category: Data.data.category ||'',
-                    subdescription: Data.data.subdescription ||'',
-                    description: Data.data.description || '',
-                    amenities: Data.data.amenities || [],
-                    images: Data.data.imagess || ['', '', '', ''],
+                    name: Data.name || '',
+                    bathrooms: Data.bathrooms || '',
+                    bedrooms: Data.bedrooms|| '',
+                    guests: Data.guests || '',
+                    rent: Data.rent || '',
+                    state: Data.state ||'',
+                    district: Data.district|| '',
+                    longitude: Data.longitude,
+                    latitude: Data.latitude,
+                    category: Data.category ||'',
+                    subdescription: Data.subdescription ||'',
+                    description: Data.description || '',
+                    amenities: Data.amenities || [],
+                    images: Data.imagess || ['', '', '', ''],
                 });
-                setAmenities(Data.data.amenities)
-                setRoomImages(Data.data.images);
-                roomId=Data.data._id
+                setAmenities([...Data.amenities]);
+                setRoomImages(Data.images);
             }
         }
         fetchData()
@@ -102,15 +118,19 @@ const EditRoom = ({ Id }: editProps) => {
     const [newAmenity, setNewAmenity] = useState<string>('');
     const [showAmenityField, setShowAmenityField] = useState<boolean>(false);
     const [amenities, setAmenities] = useState<string[]>([]);
-    const [selectedState, setSelectedState] = useState<string>('');
-    const [selectedDistrict, setSelectedDistrict] = useState<string>('');
+    const [selectedState] = useState<string>('');
+    const [selectedDistrict] = useState<string>('');
     const [seletctedCategory, setCategory] = useState<string>('');
 
+    console.log(amenities,'dh')
 
-    const handleSelectState = (state: string, district: string) => {
-        setSelectedState(state);
-        setSelectedDistrict(district);
-    };
+    const url = `https://api.geoapify.com/v1/geocode/reverse?lat=${selectedLocation?.latitude}&lon=${selectedLocation?.longitude}&apiKey=bbe9d00c85d542938910401c269a06cd`;
+    const { data: locationData, isLoading } = useQuery({
+        queryKey: ["userData", selectedLocation],
+        queryFn: () => fetch(url).then((response) => response.json()),
+        enabled: !!selectedLocation,
+    });
+
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>, key: string) => {
         const value = e.target.value;
@@ -127,6 +147,7 @@ const EditRoom = ({ Id }: editProps) => {
         setShowAmenityField(false);
     };
 
+
     const toggleMap = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault()
         setShowMap(!showMap);
@@ -142,10 +163,10 @@ const EditRoom = ({ Id }: editProps) => {
         setShowMap(!showMap);
     }
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const handleImageUpload = (e: ChangeEvent<HTMLInputElement>): void => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
-            setAddImages([...addImages,...filesArray]);
+            setAddImages((prevFiles) => [...prevFiles, ...filesArray]);
         }
     };
 
@@ -177,11 +198,12 @@ const EditRoom = ({ Id }: editProps) => {
             setAmenities(newAmenities);
         }
     };
-   console.log(addImages)
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
     
-    //     //FormData
+        const amenitiesArray: string[] = amenities;
+        //FormData
         const form = new FormData();
         form.append('name',formData.name)
         form.append('bedrooms',formData.bedrooms)
@@ -192,25 +214,15 @@ const EditRoom = ({ Id }: editProps) => {
         form.append('description',formData.description)
         form.append("latitude", formData?.latitude?.toString() || '')
         form.append("longitude", formData?.longitude?.toString() || '')
-        form.append('amenities', JSON.stringify(amenities));
+        form.append('amenities', JSON.stringify(amenitiesArray));
         form.append('state', selectedState)
         form.append('district', selectedDistrict)
         form.append('category', seletctedCategory)
-        // form.append('images',addImages)
-        // addImages.forEach((file) => {
-        //     // Using the same name with brackets (like 'images[]') can help the server recognize it as an array
-        //     form.append(`images[]`, file, file.name);
-        // });
-        // addImages.forEach((image, index) => {
-        //     form.append(`image${index}`, image);
-        // });
-        // addImages.forEach((image, index) => {
-        //     if (image instanceof File) {
-        //         form.append(`image${index}`, image);
-        //     }
-        // });
+        addImages.forEach((file) => {
+            form.append(`images`, file);
+        });
 
-    //     // Form validation
+        // Form validation
         const name = form.get('name') as string;
         const bedrooms = form.get('bedrooms') as string;
         const bathrooms = form.get('bathrooms') as string;
@@ -219,8 +231,6 @@ const EditRoom = ({ Id }: editProps) => {
         const rent = form.get('rent') as string;
         const description = form.get('description') as string;
         const Latitude = form.get('latitude') as string;
-        const state = form.get("state") as string;
-        const district = form.get('district') as string;
         const category = form.get('category') as string;
 
         if (!name.trim()) {
@@ -296,15 +306,6 @@ const EditRoom = ({ Id }: editProps) => {
             return;
         }
 
-        if (!state) {
-            toast.error('Choose a state')
-            return
-        }
-
-        if (!district) {
-            toast.error('Choose a district')
-            return
-        }
 
         if (!rent) {
             toast.error('Rent cannot be empty');
@@ -337,39 +338,10 @@ const EditRoom = ({ Id }: editProps) => {
             return;
         }
 
-        const imageArray = form.getAll('image');
-        if (imageArray) {
-            if (Array.isArray(imageArray)) {
-                for (const image of imageArray) {
-                    if (image instanceof File) {
-                        console.log('File name:', image.name);
-                    } else {
-                        console.error('Invalid image');
-                        return;
-                    }
-                }
-            } else {
-                toast.error('Invalid image type');
-                return;
-            }
-        } else {
-            toast.error('Select atleast one image');
-            return;
-        }
-
-        const amenitiesArray = form.get('amenities');
-        console.log(amenitiesArray)
-        if (amenitiesArray && typeof amenitiesArray === 'string') {
-            const parsedAmenities = JSON.parse(amenitiesArray);
-            if (Array.isArray(parsedAmenities) && parsedAmenities.length > 0) {
-            } else {
-                toast.error('Please select at least one amenity 1');
-                return;
-            }
-        } else {
-            toast.error('Please select at least one amenity 2');
-            return;
-        }
+        // if (amenitiesArray.length === 0) {
+        //     toast.error('Please select at least one amenity');
+        //     return;
+        // }
 
         if (!Latitude) {
             toast.error('Select a Location');
@@ -384,8 +356,7 @@ const EditRoom = ({ Id }: editProps) => {
         for (let [key, value] of form.entries()) {
             console.log(key, value);
         }
-        const res = await roomDataUpdate(roomId,form)
-        console.log(res)
+        const res = await roomDataUpdate(Id,form)
         const data = res?.data
         if (data.status==200) {
             navigate('/host')
@@ -463,11 +434,7 @@ const EditRoom = ({ Id }: editProps) => {
                                 <label htmlFor="guests" className="block text-gray-800 w-30">
                                     category
                                 </label>
-                                <Dropdown
-                                    options={['Rooms', 'House', 'Camping','Villa','Resort','Farm']}
-                                    onSelect={handleCategorySelect}
-                                    label="Category"
-                                />
+                                <Dropdown options={cData} onSelect={handleCategorySelect} label="Category" />
                             </div>
                         </div>
                         <div className='flex-row justify-center gap-2'>
@@ -484,9 +451,6 @@ const EditRoom = ({ Id }: editProps) => {
                                     value={formData.subdescription}
                                     onChange={(e) => handleInputChange(e, 'subdescription')}
                                 />
-                            </div>
-                            <div className='my-10'>
-                                <StateDistrictDropdown onSelectState={handleSelectState} />
                             </div>
                         </div>
                         <div className='flex-col justify-center gap-2'>
@@ -511,7 +475,7 @@ const EditRoom = ({ Id }: editProps) => {
                                     Amenities
                                 </label>
                                 <div className='flex flex-row gap-2'>
-                                    <Dropdown options={['Wifi','Parking', 'Kitchen','Locker','Spa','Reading room']} onSelect={handleAmenitySelect} label="Amenities" />
+                                    <Dropdown options={aData} onSelect={handleAmenitySelect} label="Amenities" />
                                     <button type="button" onClick={handlePlusClick}>+</button>
                                 </div>
                             </div>
@@ -589,7 +553,7 @@ const EditRoom = ({ Id }: editProps) => {
                                         {roomImages.map((image, index) => (
                                             <div key={index} className="relative">
                                                 <img
-                                                    src={(image instanceof Blob || image instanceof File) ? URL.createObjectURL(image) : image}
+                                                    src={(image instanceof File) ? URL.createObjectURL(image) : image}
                                                     alt={`Room Image ${index + 1}`}
                                                     className="w-10 h-10 object-cover rounded-lg"
                                                 />
@@ -609,10 +573,16 @@ const EditRoom = ({ Id }: editProps) => {
                                 <div className="flex items-center">
                                     {/* <label className="block text-gray-800 w-1/4">Additional Images</label> */}
                                     <div className="flex justify-start">
-                                        {addImages.map((image, index) => (
+                                        {addImages.map((image, index:number) => (
                                             <div key={index} className="relative">
                                                 <img
-                                                    src={(image instanceof Blob || image instanceof File) ? URL.createObjectURL(image) : image}
+                                                    src={(() => {
+                                                        if (image instanceof File) {
+                                                            return URL.createObjectURL(image);
+                                                        } else {
+                                                            return image;
+                                                        }
+                                                    })()}
                                                     alt={`Additional Image ${index + 1}`}
                                                     className="w-10 h-10 object-cover rounded-lg"
                                                 />
@@ -648,8 +618,16 @@ const EditRoom = ({ Id }: editProps) => {
                                 ) : (
                                     <>
                                         <div className='flex flex-row gap-5'>
-                                            <div>
-                                                Location selected
+                                            <div className='flex flex-col'>
+                                                <div>
+                                                    State: {locationData?.features[0].properties?.state}
+                                                </div>
+                                                <div>
+                                                    District: {locationData?.features[0].properties?.state_district}
+                                                </div>
+                                                <div>
+                                                    Place: {locationData?.features[0].properties?.county}
+                                                </div>
                                             </div>
                                             <div>
                                                 <BiReset onClick={handleReset} />
@@ -671,9 +649,7 @@ const EditRoom = ({ Id }: editProps) => {
                     </form>
                 </div>
             </main>
-            <footer className="bg-blue-500 p-4 text-white text-center">
-                <p>&copy; 2023 SojournNest. All rights reserved.</p>
-            </footer>
+            {isLoading && <Loader />}
         </div>
     );
 };
