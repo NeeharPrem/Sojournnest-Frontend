@@ -23,7 +23,7 @@ const UserRoutes = () => {
       <Route path="/wishlist" element={<Wishlist/>}></Route>
       <Route path="/bookings" element={<Bookings/>}></Route>
       <Route path='/managedate/:roomId' element={<ManageDate/>}></Route>
-      <Route path="/success/:Id" element={<SuccessOrFailure />} />
+      <Route path="/success" element={<SuccessOrFailure />} />
       <Route path="/failure" element={<SuccessOrFailure />} />
       <Route path="/review/:hostId" element={<ReviewPage />} />
     </Routes>
