@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query"
-import { allBookings, hsotcancelBooking } from "../../../api/userapi"
+import { allBookings, hsotcancelBooking,hostconfirmBooking} from "../../../api/userapi"
 import { useState } from "react";
 import HostModal from "../../common/modal/HostModal";
 import HostConfirm from "../../common/modal/HostConfirm";
@@ -23,6 +23,7 @@ interface Reservation {
     cancelReq: boolean;
     cancelledRole: string
     isCancelled: boolean
+    status:string
 }
 
 const Allreservation = () => {
@@ -56,11 +57,20 @@ const Allreservation = () => {
         }
     })
 
+    const { mutate: confirmBooking } = useMutation({
+        mutationFn: hostconfirmBooking,
+        onSuccess: (response) => {
+            if (response?.status === 200) {
+                refetch()
+            }
+        }
+    })
+
     const handleConfirmCancellation = (selectedValue:string) => {
-        if (selectedValue === 'confirm'){
+        if (selectedValue === 'cancelled'){
             confirmCancellation(selectedReservation)
-        } else{
-            
+        } else if (selectedValue === 'confirm'){
+            confirmBooking(selectedReservation)
         }
         setModalOpen(false);
         setConfrim(false)
@@ -140,9 +150,6 @@ const Allreservation = () => {
                         <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Action/status
                         </th>
-                        {/* <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Details
-                        </th> */}
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -172,19 +179,20 @@ const Allreservation = () => {
                                     >
                                         Cancel Request
                                     </button>
-                                ) : (!item.cancelReq && !item.isCancelled ? (
-                                    <button className="bg-gray-500 text-white lg:p-2 rounded-md" onClick={handleAction}
-                                    data-reservation-id={item._id}
+                                ) : (!item.cancelReq && !item.isCancelled && item.status === "pending") ? (
+                                    <button
+                                        className="bg-gray-500 text-white lg:p-2 rounded-md"
+                                        onClick={handleAction}
+                                        data-reservation-id={item._id}
                                     >
                                         Action
                                     </button>
-                                ) : 'cancelled')}
+                                ) : item.status === "confirmed" ? (
+                                    "Confirmed"
+                                ) : (
+                                    item.status.charAt(0).toUpperCase() + item.status.slice(1)
+                                )}
                             </td>
-                            {/* <td className="px-6 py-4 whitespace-nowrap text-center">
-                                <button>
-                                    Details
-                                </button>
-                            </td> */}
                         </tr>
                     ))}
                 </tbody>
