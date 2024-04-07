@@ -23,7 +23,6 @@ interface ReviewsData {
 
 
 const ReviewComp = () => {
-    const [review, setReview] = useState('');
     const [showModal, setShowModal] = useState(false)
     const [editModal, setEditModal] = useState(false)
     const [rating, setRating] = useState(0.5);
