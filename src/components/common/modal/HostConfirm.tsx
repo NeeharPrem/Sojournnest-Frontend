@@ -8,7 +8,7 @@ const HostConfirm: React.FC<ModalProps> = ({ isOpen, onClose, onConfirm }) => {
     if (!isOpen) return null;
 
     const handleConfirm = () => {
-            onConfirm('confirm');
+            onConfirm('cancelled');
     };
   return (
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
