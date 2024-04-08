@@ -14,6 +14,7 @@ import { onMessage } from "firebase/messaging";
 import { saveFcmtoken } from "./api/userapi";
 import { useSelector} from "react-redux";
 import SuccessOrFailure from "../src/pages/user/success or failure/success"
+import Failure from "./pages/user/success or failure/failure";
 
 interface RootState {
   auth: {
@@ -51,6 +52,7 @@ export default function App() {
         <Route path="/signup" element={<UserSignup />} />
         <Route path='/details/:roomId' element={<ListingDetails/>}/>
         <Route path="/payscs" element={<SuccessOrFailure/>} />
+        <Route path="/failed" element={<Failure />} />
 
         {/* Admin Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
