@@ -50,7 +50,7 @@ export default function App() {
         <Route path="/login" element={<UserLogin />} />
         <Route path="/signup" element={<UserSignup />} />
         <Route path='/details/:roomId' element={<ListingDetails/>}/>
-        <Route path="/success" element={<SuccessOrFailure />} />
+        <Route path="/payscs" element={<SuccessOrFailure/>} />
 
         {/* Admin Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
