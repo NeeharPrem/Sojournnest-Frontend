@@ -1,6 +1,6 @@
 import { useNavigate} from "react-router-dom"
 import { useEffect,useState} from "react";
-import { getUser } from "../../../api/userapi";
+// import { getUser } from "../../../api/userapi";
 import { useSelector } from 'react-redux';
 import { RootState } from "../../../store/store";
 import { clearBookingDetails } from "../../../store/slice/bookingSlice";
@@ -8,13 +8,13 @@ import { useDispatch } from 'react-redux';
 import Loader from "../../common/Loader";
 
 
-interface UserData {
-    fcmToken:string
-}
+// interface UserData {
+//     fcmToken:string
+// }
 
-interface UserResponse {
-    data:UserData
-}
+// interface UserResponse {
+//     data:UserData
+// }
 
 interface BookingDetails {
     roomName: string;
@@ -30,7 +30,7 @@ const Successcomp = () => {
 
     const navigate= useNavigate()
     const dispatch = useDispatch();
-    const [, setUserData] = useState<UserData | null>(null);
+    // const [, setUserData] = useState<UserData | null>(null);
     const [newData,setData]=useState<BookingDetails| null>(null);
     const booking = useSelector((state: RootState) => state.booking);
 
