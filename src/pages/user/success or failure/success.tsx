@@ -1,7 +1,6 @@
 import Navbar from "../../../components/Navbar";
-import Successcomp from "../../../components/user/payment/success";
+import Successcomp from "../../../components/user/payment/Successcomp";
 const Success = () => {
-
     return (
         <>
             <Navbar />
