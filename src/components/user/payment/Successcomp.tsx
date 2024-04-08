@@ -47,51 +47,51 @@ const Successcomp = () => {
             });
         }
         dispatch(clearBookingDetails());
-        const Id = newData?.hostId
-        const fetchData = async () => {
-            try {
-                if (Id && Id.trim() !== '') {
-                    const response: UserResponse = await getUser(Id);
-                    setUserData(response.data);
-                    if (response.data) {
-                        const fcmToken = response.data.fcmToken;
-                        const YOUR_PROJECT_ID = "notification-b689b";
-                        const YOUR_ACCESS_TOKEN = "BABkit8FHSso4jub4CLZvhFKMCEK32azzzrbpMqIAqKyj8G0WXwt5gHYaUgWjsUYlVwuy4L1uCiZBJ2F29VdW0w";
-                        const message = {
-                            "message": {
-                                "token": fcmToken,
-                                "notification": {
-                                    "title": "New Booking",
-                                    "body": "New Booking added check your dashboard"
-                                },
-                                "webpush": {
-                                    "fcm_options": {
-                                        "link": "https://dummypage.com"
-                                    }
-                                }
-                            }
-                        };
+        // const Id = newData?.hostId
+        // const fetchData = async () => {
+        //     try {
+        //         if (Id && Id.trim() !== '') {
+        //             const response: UserResponse = await getUser(Id);
+        //             setUserData(response.data);
+        //             if (response.data) {
+        //                 const fcmToken = response.data.fcmToken;
+        //                 const YOUR_PROJECT_ID = "notification-b689b";
+        //                 const YOUR_ACCESS_TOKEN = "BABkit8FHSso4jub4CLZvhFKMCEK32azzzrbpMqIAqKyj8G0WXwt5gHYaUgWjsUYlVwuy4L1uCiZBJ2F29VdW0w";
+        //                 const message = {
+        //                     "message": {
+        //                         "token": fcmToken,
+        //                         "notification": {
+        //                             "title": "New Booking",
+        //                             "body": "New Booking added check your dashboard"
+        //                         },
+        //                         "webpush": {
+        //                             "fcm_options": {
+        //                                 "link": "https://dummypage.com"
+        //                             }
+        //                         }
+        //                     }
+        //                 };
 
-                        fetch(`https://fcm.googleapis.com/v1/projects/${YOUR_PROJECT_ID}/messages:send`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${YOUR_ACCESS_TOKEN}`
-                            },
-                            body: JSON.stringify(message)
-                        })
-                            .then(response => response.json())
-                            .then(data => console.log('FCM message sent:', data))
-                            .catch(error => console.error('Error sending FCM message:', error));
-                    }
-                } else {
-                    console.error('User ID is undefined or empty');
-                }
-            } catch (error) {
-                console.error('Failed to fetch user data:', error);
-            }
-        };
-        fetchData();
+        //                 fetch(`https://fcm.googleapis.com/v1/projects/${YOUR_PROJECT_ID}/messages:send`, {
+        //                     method: 'POST',
+        //                     headers: {
+        //                         'Content-Type': 'application/json',
+        //                         'Authorization': `Bearer ${YOUR_ACCESS_TOKEN}`
+        //                     },
+        //                     body: JSON.stringify(message)
+        //                 })
+        //                     .then(response => response.json())
+        //                     .then(data => console.log('FCM message sent:', data))
+        //                     .catch(error => console.error('Error sending FCM message:', error));
+        //             }
+        //         } else {
+        //             console.error('User ID is undefined or empty');
+        //         }
+        //     } catch (error) {
+        //         console.error('Failed to fetch user data:', error);
+        //     }
+        // };
+        // fetchData();
         
     }, [dispatch,navigate]);
     
