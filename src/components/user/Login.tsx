@@ -8,6 +8,9 @@ import { login} from "../../api/userapi";
 import { useMutation } from "@tanstack/react-query";
 import { setLogin } from "../../store/slice/authSlice";
 import { saveFcmtoken } from "../../api/userapi";
+import EnterEmail from "./Forgotpass/EnterEmail";
+import ForgetOtp from "./Forgotpass/forgetOtp";
+import EnterPass from "./Forgotpass/EnterPass";
 
 const G_Password = import.meta.env.VITE_GOOGLE_PASSWORD;
 
@@ -20,6 +23,9 @@ interface RootState {
 const Login = () => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [openForget,setOpenForget]=useState(false)
+    const [opeOtp, setOpenOtp] = useState(false);
+    const [enterPass,setEnterPass]=useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -86,6 +92,26 @@ const Login = () => {
         userLoginMutate(formData);
     };
 
+    const passreset=()=>{
+      setOpenForget(true)
+    }
+
+    const handleCloseForget = () => {
+        setOpenForget(false);
+    };
+
+    const handlePassInput = () => {
+        setEnterPass(false);
+    };
+
+    if (openForget) {
+        return <EnterEmail onClose={handleCloseForget} setOpenOtp={setOpenOtp} />;
+    }
+
+    if (enterPass){
+        return <EnterPass onClose={handlePassInput}/>;
+    }
+
     return (
         <>
             <div>
@@ -116,12 +142,25 @@ const Login = () => {
                                         }}
                                     />
                             </div>
-                            <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                                Don't have an account? <Link to='/signup'>Signup here</Link>
-                            </p>
+                            <div className='flex flex-row justify-between'>
+                                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                                    Don't have an account? <Link to='/signup'>Signup here</Link>
+                                </p>
+                                <button className="text-sm font-light text-gray-500 dark:text-gray-400" onClick={passreset}>
+                                    Forgot password
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+                {opeOtp && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                        <ForgetOtp
+                            setIscomplete={setOpenOtp}
+                            setEnterPass={setEnterPass}
+                        />
+                    </div>
+                )}
             </div>
         </>
     );
