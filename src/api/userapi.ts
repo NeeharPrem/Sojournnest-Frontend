@@ -746,3 +746,61 @@ export const saveFcmtoken = async (token: string) => {
     }
   }
 };
+
+export const sentOtp = async (user: Object) => {
+  try {
+    const response = await Api.post(userEndpoints.sentOtp, user);
+    return response;
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const verifyOtp = async (user: Object) => {
+  try {
+    const response = await Api.post(userEndpoints.verifyOtp, user);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.message || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const resentOtp = async () => {
+  try {
+    const response = await Api.post(userEndpoints.resentOtp);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const setNewPass = async (user:object) => {
+  try {
+    const response = await Api.post(userEndpoints.setNewPass,user);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
