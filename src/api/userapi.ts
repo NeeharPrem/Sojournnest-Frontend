@@ -760,6 +760,19 @@ export const sentOtp = async (user: Object) => {
   }
 };
 
+export const checkUpdateEmail = async (user: Object) => {
+  try {
+    const response = await Api.post(userEndpoints.checkUpdateEmail, user);
+    return response;
+  } catch (error) {
+    if (error && (error as AxiosError).isAxiosError) {
+      console.log(error);
+    } else {
+      toast.error("Something went wrong");
+    }
+  }
+};
+
 export const verifyOtp = async (user: Object) => {
   try {
     const response = await Api.post(userEndpoints.verifyOtp, user);
@@ -793,6 +806,21 @@ export const resentOtp = async () => {
 export const setNewPass = async (user:object) => {
   try {
     const response = await Api.post(userEndpoints.setNewPass,user);
+    return response;
+  } catch (error: any) {
+    if (error.response) {
+      const errorMessage = error.response.data.error || "Something went wrong";
+      toast.error(errorMessage);
+    } else {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+};
+
+export const updateEmail = async (user: object) => {
+  try {
+    const response = await Api.post(userEndpoints.updateEmail, user);
     return response;
   } catch (error: any) {
     if (error.response) {
