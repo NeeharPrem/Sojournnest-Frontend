@@ -3,6 +3,8 @@ import Loader from "../common/Loader";
 import { updateProfile,uploadId} from "../../api/userapi";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import ProfileOtp from "./ProfileOtp";
+import { sentOtp, checkUpdateEmail, updateEmail } from "../../api/userapi";
 
 interface ProfileBody {
   userInfo: {
@@ -35,6 +37,80 @@ const ProfileBody: React.FC<ProfileBody> = ({
   const [selectedId, setSelectedId] = useState<File | null>(null);
   const [oldpass, setOldPass] = useState("");
   const [newpass, setNewPass] = useState("");
+  const [isEmailEditing, setIsEmailEditing] = useState(false);
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [isEmailUpdate, setisEmailUpdate]=useState(false)
+
+  const { mutate: sentOTP } = useMutation({
+    mutationFn: sentOtp,
+    onSuccess: async (response) => {
+      if (response?.status === 200 && response.data.state == true) {
+        toast.success(response.data.message)
+      } else if (response?.status === 200 && response.data.state == false) {
+        toast.success(response.data.message)
+      }
+    },
+  });
+
+  const { mutate: checkMail } = useMutation({
+    mutationFn: checkUpdateEmail,
+    onSuccess: async (response) => {
+      if (response?.status === 200 && response.data.state == true) {
+        toast.success(response.data.message)
+        setIsOtpModalOpen(true);
+      } else if (response?.status === 200 && response.data.state == false) {
+        toast.success(response.data.message)
+      }
+    },
+  });
+
+  const { mutate:mailUpdate } = useMutation({
+    mutationFn: updateEmail,
+    onSuccess: async (response) => {
+      if(response?.data.status===200){
+        toast.success(response?.data.data.message)
+        setIsEmailEditing(false)
+        refetch()
+      }
+    },
+  });
+
+  const handleEmailEditClick = () => {
+    const data={
+      email:email
+    }
+    sentOTP(data)
+    setIsOtpModalOpen(true);
+  };
+
+  const handleEmailCancelClick = () => {
+    setIsEmailEditing(false);
+  };
+
+  const handleEmailSave=()=>{
+    const data={
+      id:userInfo.id,
+      email:email
+    }
+    mailUpdate(data)
+  }
+  
+  const handleEmailSaveClick = () => {
+    if (!email) {
+      toast.error('Email cannot be empty');
+      return;
+    }
+    const data={
+      email:email
+    }
+    setisEmailUpdate(true)
+    setIsEmailEditing(false)
+    checkMail(data)
+  };
+
+  const handleCloseOtp=()=>{
+    setIsOtpModalOpen(false)
+  }
 
   useEffect(() => {
     setFirstName(userInfo.fname);
@@ -173,8 +249,19 @@ const ProfileBody: React.FC<ProfileBody> = ({
     },
   });
 
+  const renderOtpModal = () => {
+    if (isOtpModalOpen) {
+      return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+          <ProfileOtp onClose={handleCloseOtp} setIsEmailEditing={setIsEmailEditing} EmailSave={handleEmailSave} isEmailUpdate={isEmailUpdate}/>
+        </div>
+      );
+    }
+  };
+
   return (
     <>
+      {renderOtpModal()}
       <div className="lg:border-l w-full">
         <div className="flex flex-col md:flex-row bg-white p-10">
           <div className="flex flex-col md:w-2/5 lg:w-full">
@@ -229,8 +316,44 @@ const ProfileBody: React.FC<ProfileBody> = ({
             <div className="border-b p-5 flex items-center justify-between">
               <div>
                 <div className="font-bold text-lg">Email</div>
-                <div className="pt-2">{`${email}`}</div>
+                {isEmailEditing && userInfo.isgoogle === false ? (
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="border p-1"
+                  />
+                ) : (
+                  <div className="pt-2">{`${email}`}</div>
+                )}
               </div>
+              {isEmailEditing && userInfo.isgoogle === false ? (
+                <>
+                  <div className="flex flex-col">
+                    <button
+                      className="font-medium text-black px-3 py-1 underline"
+                      onClick={handleEmailSaveClick}
+                    >
+                      save
+                    </button>
+                    <button
+                      className="font-medium text-black px-3 py-1 underline"
+                      onClick={handleEmailCancelClick}
+                    >
+                      cancel
+                    </button>
+                  </div>
+                </>
+              ) : (
+                userInfo.isgoogle === false && (
+                  <button
+                    className="font-medium text-black px-3 py-1 underline"
+                    onClick={handleEmailEditClick}
+                  >
+                    edit
+                  </button>
+                )
+              )}
             </div>
             <div className="border-b p-5 flex items-center justify-between">
               <div>
