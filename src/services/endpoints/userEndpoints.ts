@@ -52,7 +52,9 @@ const userEndpoints = {
   sentOtp:'/users/sent-otp',
   verifyOtp:'/users/otp-verify',
   resentOtp:'/users/otp-resent',
-  setNewPass:'/users/setnewpass'
+  setNewPass:'/users/setnewpass',
+  checkUpdateEmail:'/users/checkMail',
+  updateEmail:'/users/updateEmail'
 };
 
 export default userEndpoints;
