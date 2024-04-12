@@ -76,7 +76,7 @@ const Booking = () => {
                 <div className="flex flex-row gap-4 border-b">
                     <div className={`border-b pb-2 ${isUpcoming ? 'text-gray-600' : 'text-blue-500'}`}>
                         <button onClick={handleUpcomingClick} className="font-bold">
-                            Upcoming
+                            Upcoming / Completed
                         </button>
                     </div>
                     <div className={`border-b pb-2 ${!isUpcoming ? 'text-gray-600' : 'text-blue-500'}`}>
