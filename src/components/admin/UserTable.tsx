@@ -168,17 +168,21 @@ const UserTable= () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <div className="text-sm text-gray-900">
-                      {!data?.is_approved && data?.verifyId ? (
-                        <button
-                          onClick={() => openApproveModal(data._id, data.verifyId)}
-                          className="bg-green-900 text-white py-1 px-2 rounded-lg"
-                        >
-                          Approve
-                        </button>
+                      {data?.is_approved === false ? (
+                        data?.verifyId !== '' ? (
+                          <button
+                            onClick={() => openApproveModal(data._id, data.verifyId)}
+                            className="bg-green-900 text-white py-1 px-2 rounded-lg"
+                          >
+                            Approve
+                          </button>
+                        ) : (
+                          <h3 className="text-red-600">No ID uploaded</h3>
+                        )
                       ) : (
                         <h3 className="text-green-600">Approved</h3>
                       )}
-                      </div>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <div className="text-sm text-gray-900">
