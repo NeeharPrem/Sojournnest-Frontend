@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate} from "react-router-dom";
-import { toast } from "react-toastify";
+import {toast} from "sonner";
 import { GoogleLogin } from "@react-oauth/google";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -56,6 +56,7 @@ const Login = () => {
                     id: response.data?.message?._id,
                     fname: response.data?.message?.fname,
                     lname: response.data?.message?.lname,
+                    verified: response.data.message.is_approved
                 };
                 dispatch(setLogin({ userId: data.id, userLoggedin: data }));
                 await handleTokenAfterLogin();
@@ -77,6 +78,7 @@ const Login = () => {
                 id: result.data.message._id,
                 fname: result.data.message.fname,
                 lname: result.data.message.lname,
+                verified:result.data.message.is_approved
             };
             dispatch(setLogin({ userId: data.id, userLoggedin: data }));
             await handleTokenAfterLogin();
