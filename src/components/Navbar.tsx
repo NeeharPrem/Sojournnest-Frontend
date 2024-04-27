@@ -55,24 +55,16 @@ const NavBar = () => {
     <div className="shadow-md w-full top-0 left-0 fixed bg-white z-50">
       <div className="md:flex items-center justify-between py-4 md:px-10 px-5">
         <div className="font-semibold text-xl cursor-pointer flex items-center text-gray-800">
-          {/* Example place for a logo or brand name */}
           <span>SojournNest</span>
         </div>
-
-        {/* Central search bar - only displayed in larger screens */}
         <div className="hidden md:block flex-grow mx-4">
-          {/* <SearchBar /> */}
         </div>
-
-        {/* Menu toggle icon for smaller screens */}
         <div
           onClick={() => setOpen(!open)}
           className="md:hidden absolute right-8 top-6 cursor-pointer w-7 h-7"
         >
           {open ? <XMarkIcon className="w-6 h-6" /> : <Bars3BottomRightIcon className="w-6 h-6" />}
         </div>
-
-        {/* Navigation Links */}
         <ul
           className={`md:flex items-center absolute md:static bg-white md:z-auto z-[-1] left-0 w-full md:w-auto transition-all duration-500 ease-in ${open ? "top-16" : "top-[-490px]"}`}
         >
@@ -94,10 +86,8 @@ const NavBar = () => {
             </li>
           ))}
         </ul>
-        {/* Mobile search bar - displayed only on smaller screens */}
         {open && (
           <div className="md:hidden mt-4 px-5">
-            {/* <SearchBar /> */}
           </div>
         )}
       </div>
